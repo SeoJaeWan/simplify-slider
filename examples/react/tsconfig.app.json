@@ -24,7 +24,7 @@
 
     "baseUrl": ".",
     "paths": {
-      "simplify-slider/react": ["../../src/react/simplifySlider.tsx"]
+      "simplify-slider/react": ["../../dist/react/"]
     }
   },
   "include": ["src"]
