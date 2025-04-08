@@ -34,15 +34,10 @@ jobs:
       - name: Run tests
         run: npm test -- --json --outputFile=test-results.json
 
-      - name: Post Comment on PR
+      - name: Create comment body
         if: failure()
         run: |
-          if [ ! -f test-results.json ]; then
-            echo "No test results found!"
-            exit 1
-          fi
-
-          TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message' || echo "No valid test results")
+          TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message')
           COMMENT_BODY="## 🚨 Test Failed 🚨\n작성한 테스트를 통과하지 못했습니다.\n테스트 케이스를 점검해주세요!\n\n**테스트 결과 메시지:**\n$TEST_OUTPUT"
 
           echo "COMMENT_BODY<<EOF" >> $GITHUB_ENV
@@ -50,6 +45,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create or update comment
+        if: failure()
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number}}
