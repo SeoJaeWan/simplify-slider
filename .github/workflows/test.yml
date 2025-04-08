@@ -45,7 +45,7 @@ jobs:
           TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message' || echo "No valid test results")
           COMMENT_BODY="## 🚨 Test Failed 🚨\n작성한 테스트를 통과하지 못했습니다.\n테스트 케이스를 점검해주세요!\n\n**테스트 결과 메시지:**\n$TEST_OUTPUT"
 
-          echo "COMMENT_BODY=$COMMENT_BODY" >> $GITHUB_ENV
+          echo "COMMENT_BODY=$COMMENT_BODY" | sed 's/$/\n/' >> $GITHUB_ENV
 
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v2
