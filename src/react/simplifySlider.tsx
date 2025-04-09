@@ -1,15 +1,13 @@
 import { PropsWithChildren } from "react";
-
+import SimplifySlide from "./components/simplifySlide";
 export interface SimplifySliderProps extends PropsWithChildren {
-  pagination?: boolean;
+  children: React.ReactNode;
 }
 
 const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
-  const { children, pagination } = props;
-
-  console.error(pagination);
+  const { children } = props;
 
   return <div>{children}</div>;
 };
 
-export { SimplifySlider };
+export { SimplifySlider, SimplifySlide };
