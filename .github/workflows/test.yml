@@ -38,14 +38,9 @@ jobs:
         if: failure()
         run: |
           TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message')
-          COMMENT_BODY=`## 🚨 Test Failed 🚨<br/>
-          작성한 테스트를 통과하지 못했습니다.<br/>
-          테스트 케이스를 점검해주세요!<br/><br/>
-          **테스트 결과 메시지:**<br/>
-          $TEST_OUTPUT`
 
-          echo "COMMENT_BODY<<EOF" >> $GITHUB_ENV
-          echo "$COMMENT_BODY" >> $GITHUB_ENV
+          echo "TEST_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$TEST_OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create or update comment
@@ -53,4 +48,10 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number}}
-          body: ${{ env.COMMENT_BODY }}
+          body: |
+            ## 🚨 Test Failed 🚨
+            작성한 테스트를 통과하지 못했습니다.
+            테스트 케이스를 점검해주세요!
+
+            **테스트 결과 메시지:**
+            ${{ env.TEST_OUTPUT }}
