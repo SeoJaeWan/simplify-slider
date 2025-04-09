@@ -55,3 +55,11 @@ jobs:
 
             **테스트 결과 메시지:**
             ${{ env.TEST_OUTPUT }}
+
+      - name: Set status check result to failure
+        if: failure()
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state":"failure","description":"Test failed","context":"Test Status"}' \
+            https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
