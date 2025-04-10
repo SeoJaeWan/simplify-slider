@@ -13,4 +13,8 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   minify: true,
+
+  loader: {
+    ".css": "copy",
+  },
 });
