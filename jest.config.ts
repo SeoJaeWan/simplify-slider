@@ -4,7 +4,7 @@ const config: Config = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    "^simplify-slider/react$": "<rootDir>/dist/react/index.js",
+    "\\.css$": "identity-obj-proxy",
   },
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
