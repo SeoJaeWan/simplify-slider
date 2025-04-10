@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import SimplifySlide from "./simplifySlide";
+import SimplifySlide from ".";
 
 describe("Simplify Slide 테스트", () => {
   it("React Node를 children으로 전달받으면 Simplify Slide와 함께 렌더링된다.", () => {
@@ -24,5 +24,9 @@ describe("Simplify Slide 테스트", () => {
 
     const children = getByText("Test");
     expect(children).toBeInTheDocument();
+  });
+
+  it("Simplify Slide는 displayName이 'SimplifySlide'이다.", () => {
+    expect(SimplifySlide.displayName).toBe("SimplifySlide");
   });
 });

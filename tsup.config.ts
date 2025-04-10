@@ -2,7 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: {
-    "react/index": "src/react/simplifySlider.tsx",
+    "react/index": "src/react/index.ts",
   },
   format: ["cjs", "esm"],
   dts: true,
@@ -13,4 +13,8 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   minify: true,
+
+  loader: {
+    ".css": "copy",
+  },
 });
