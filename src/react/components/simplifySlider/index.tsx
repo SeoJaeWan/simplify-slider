@@ -1,22 +1,15 @@
-import { Children, cloneElement, isValidElement, PropsWithChildren, ReactNode } from "react";
+import { Children, cloneElement, isValidElement } from "react";
+import type { ReactNode, PropsWithChildren, ReactElement } from "react";
 import SimplifySlide from "../simplifySlide";
-import isComponentWithDisplayName from "../../utils/isComponentWithDisplayName";
 import "./simplifySlider.css";
 
-export interface SimplifySliderProps extends PropsWithChildren {
-  children: ReactNode;
-}
-
-const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
+const SimplifySlider: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
-  const slides: ReactNode[] = [];
+  const slides: ReactElement[] = [];
   const others: ReactNode[] = [];
 
   Children.forEach(children, (child) => {
-    if (
-      isValidElement(child) &&
-      (child.type === SimplifySlide || isComponentWithDisplayName(child.type, "SimplifySlide"))
-    ) {
+    if (isValidElement(child) && child.type === SimplifySlide) {
       slides.push(child);
     } else {
       others.push(child);
@@ -26,9 +19,7 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
   return (
     <div className={"simplify-slider"}>
       <div className={"wrapper"}>
-        <ol className={"list"}>
-          {slides.map((slide, index) => (isValidElement(slide) ? cloneElement(slide, { key: index }) : slide))}
-        </ol>
+        <ol className={"list"}>{slides.map((slide, index) => cloneElement(slide, { key: index }))}</ol>
       </div>
 
       {others.map((other, index) => (isValidElement(other) ? cloneElement(other, { key: index }) : other))}
