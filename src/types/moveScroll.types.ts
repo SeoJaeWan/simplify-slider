@@ -11,4 +11,10 @@ export interface MoveScrollOptions {
    * @type {number}
    */
   duration?: number;
+  /**
+   * Whether to enable drag functionality for the slides.
+   * @default false
+   * @type {boolean}
+   */
+  drag?: boolean;
 }

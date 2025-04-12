@@ -5,11 +5,19 @@ function App() {
     <SimplifySlider
       options={{
         loop: true,
+        drag: true,
+        duration: 10000,
       }}
     >
-      <SimplifySlide>1</SimplifySlide>
-      <SimplifySlide>2</SimplifySlide>
-      <SimplifySlide>3</SimplifySlide>
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>1</div>
+      </SimplifySlide>
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>2</div>
+      </SimplifySlide>
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>3</div>
+      </SimplifySlide>
 
       <div>테스트</div>
       <div>테스트</div>
