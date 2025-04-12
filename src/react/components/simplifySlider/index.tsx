@@ -3,11 +3,7 @@ import type { ReactNode, PropsWithChildren, ReactElement } from "react";
 import SimplifySlide from "../simplifySlide";
 import "./simplifySlider.css";
 
-export interface SimplifySliderProps extends PropsWithChildren {
-  children: ReactNode;
-}
-
-const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
+const SimplifySlider: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
   const slides: ReactElement[] = [];
   const others: ReactNode[] = [];
