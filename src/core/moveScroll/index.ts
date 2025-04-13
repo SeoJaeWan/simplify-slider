@@ -1,4 +1,5 @@
 import { MoveScrollOptions } from "../../types/moveScroll.types";
+import { Drag } from "../drag";
 
 const defaultOptions: MoveScrollOptions = {
   loop: false,
@@ -16,11 +17,7 @@ class MoveScroll {
   private min: number = 1;
   private max;
 
-  private bindTransitionEnd: () => void;
-
-  private isDrag: boolean = false;
-  private startX: number = 0;
-  private currentX: number = 0;
+  private drag?: Drag;
 
   constructor(wrapper: HTMLOListElement, length: number, options?: MoveScrollOptions) {
     this.wrapper = wrapper;
@@ -28,8 +25,6 @@ class MoveScroll {
     this.options = { ...defaultOptions, ...options };
 
     this.max = length;
-
-    this.bindTransitionEnd = this.TransitionEnd.bind(this);
 
     this.init();
   }
@@ -54,7 +49,36 @@ class MoveScroll {
     this.wrapper.appendChild(clonedFirst);
 
     this.setCurrentIndexTransform();
-    this.setDrag();
+
+    this.initDrag();
+  }
+
+  private initDrag() {
+    if (!this.options.drag) return;
+
+    this.drag = new Drag({
+      element: this.wrapper,
+      getTranslateX: this.getTranslateX.bind(this),
+      getWrapperWidth: this.getWrapperWidth.bind(this),
+      onDragMove: this.updateTransform.bind(this),
+      onDragSlide: (direction) => {
+        if (this.isLoading) return;
+
+        if (direction === "prev") {
+          if (!this.options.loop && this.currentIndex === this.min) {
+            this.updateSlide(1000);
+          } else {
+            this.prev();
+          }
+        } else if (direction === "next") {
+          if (!this.options.loop && this.currentIndex === this.max) {
+            this.updateSlide(1000);
+          } else {
+            this.next();
+          }
+        }
+      },
+    });
   }
 
   private disableTransition() {
@@ -80,89 +104,7 @@ class MoveScroll {
     this.updateTransform(this.getTranslateX());
   }
 
-  private setBodyDraggingStyle(isDragging: boolean) {
-    document.body.style.cursor = isDragging ? "grabbing" : "auto";
-    document.body.style.userSelect = isDragging ? "none" : "auto";
-  }
-
-  private dragStart = (e: MouseEvent) => {
-    if (this.isLoading) return;
-
-    this.isDrag = true;
-    this.startX = e.clientX;
-    this.currentX = e.clientX;
-
-    this.setBodyDraggingStyle(true);
-    this.disableTransition();
-
-    window.addEventListener("mousemove", this.dragMove);
-  };
-
-  private checkOverPrevBound(currentX: number, width: number) {
-    return currentX >= this.getTranslateX() + width / 2;
-  }
-
-  private checkOverNextBound(currentX: number, width: number) {
-    return currentX <= this.getTranslateX() - width / 2;
-  }
-
-  private slideMovement(direction: "prev" | "next") {
-    if (direction === "prev") {
-      if (!this.options.loop && this.currentIndex === this.min) {
-        this.updateSlide(1000);
-      } else {
-        this.prev();
-      }
-    } else {
-      if (!this.options.loop && this.currentIndex === this.max) {
-        this.updateSlide(1000);
-      } else {
-        this.next();
-      }
-    }
-    this.dragEnd();
-  }
-
-  private dragMove = (e: MouseEvent) => {
-    if (!this.isDrag) return;
-
-    this.currentX = e.clientX;
-
-    const width = this.getWrapperWidth();
-    const diffX = this.startX - this.currentX;
-
-    const currentX = this.getTranslateX() - diffX;
-
-    if (this.checkOverPrevBound(currentX, width)) {
-      this.slideMovement("prev");
-    } else if (this.checkOverNextBound(currentX, width)) {
-      this.slideMovement("next");
-    } else {
-      this.updateTransform(currentX);
-    }
-  };
-
-  private dragEnd = () => {
-    if (this.isDrag) {
-      this.isDrag = false;
-      this.startX = 0;
-      this.currentX = 0;
-
-      this.setBodyDraggingStyle(false);
-
-      this.setCurrentIndexTransform();
-      window.removeEventListener("mousemove", this.dragMove);
-    }
-  };
-
-  private setDrag() {
-    if (!this.options.drag) return;
-
-    this.wrapper.addEventListener("mousedown", this.dragStart);
-    window.addEventListener("mouseup", this.dragEnd);
-  }
-
-  private TransitionEnd() {
+  private transitionEnd = () => {
     this.disableTransition();
 
     if (this.currentIndex > this.max) {
@@ -174,10 +116,10 @@ class MoveScroll {
     }
 
     this.isLoading = false;
-  }
+  };
 
   private clearTransition() {
-    this.wrapper.addEventListener("transitionend", this.bindTransitionEnd);
+    this.wrapper.addEventListener("transitionend", this.transitionEnd);
   }
 
   private updateSlide(duration?: number) {
@@ -200,11 +142,11 @@ class MoveScroll {
   }
 
   public next(): void {
-    this.moveTo(this.currentIndex + 1);
+    this.moveTo(this.getCurrentIndex() + 1);
   }
 
   public prev(): void {
-    this.moveTo(this.currentIndex - 1);
+    this.moveTo(this.getCurrentIndex() - 1);
   }
 
   public goTo(index: number): void {

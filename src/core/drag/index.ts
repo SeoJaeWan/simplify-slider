@@ -1,72 +1,130 @@
-// import Core from "..";
+type Direction = "prev" | "next" | "move";
 
-// class Drag {
-//   private core: Core;
+interface DragOptions {
+  element: HTMLElement;
+  getTranslateX: () => number;
+  getWrapperWidth: () => number;
+  onDragMove: (x: number) => void;
+  onDragSlide: (direction: Direction) => void;
+}
 
-//   private isDrag: boolean = false;
-//   private startX: number = 0;
-//   private currentX: number = 0;
+export class Drag {
+  private isDrag = false;
+  private startX = 0;
+  private currentX = 0;
 
-//   constructor(core: Core) {
-//     this.core = core;
-//   }
+  private animationFrameId: number | null = null;
+  private pendingX: number | null = null;
 
-//   public dragStart(e: MouseEvent) {
-//     if (this.core.getIsLoading()) return;
+  private readonly el: HTMLElement;
+  private readonly getTranslateX: () => number;
+  private readonly getWrapperWidth: () => number;
+  private readonly onDragMove: (x: number) => void;
+  private readonly onDragSlide: (dir: Direction) => void;
 
-//     this.isDrag = true;
-//     this.startX = e.clientX;
-//     this.currentX = e.clientX;
+  constructor(options: DragOptions) {
+    this.el = options.element;
+    this.getTranslateX = options.getTranslateX;
+    this.getWrapperWidth = options.getWrapperWidth;
+    this.onDragMove = options.onDragMove;
+    this.onDragSlide = options.onDragSlide;
 
-//     document.body.style.cursor = "grabbing";
-//     document.body.style.userSelect = "none";
-//     this.core.wrapper.style.transition = "none";
+    this.bindEvents();
+  }
 
-//     window.addEventListener("mousemove", this.dragMove);
-//   }
+  private bindEvents() {
+    this.el.addEventListener("mousedown", this.dragStartMouse);
+    window.addEventListener("mouseup", this.dragEnd);
+    window.addEventListener("mousemove", this.dragMoveMouse);
 
-//   public dragMove = (e: MouseEvent) => {
-//     if (!this.isDrag) return;
+    this.el.addEventListener("touchstart", this.dragStartTouch, { passive: false });
+    window.addEventListener("touchend", this.dragEnd);
+    window.addEventListener("touchmove", this.dragMoveTouch, { passive: false });
+  }
 
-//     // this.currentX = e.clientX;
-//     // const width = this.getWrapperWidth();
-//     // const diffX = this.startX - this.currentX;
+  public destroy() {
+    this.el.removeEventListener("mousedown", this.dragStartMouse);
+    window.removeEventListener("mouseup", this.dragEnd);
+    window.removeEventListener("mousemove", this.dragMoveMouse);
 
-//     // const prevX = this.getTranslateX() + width / 2;
-//     // const nextX = this.getTranslateX() - width / 2;
+    this.el.removeEventListener("touchstart", this.dragStartTouch);
+    window.removeEventListener("touchend", this.dragEnd);
+    window.removeEventListener("touchmove", this.dragMoveTouch);
+  }
 
-//     // const dragX = this.getTranslateX() - diffX;
+  private dragStartMouse = (e: MouseEvent) => {
+    this.startDrag(e.clientX);
+  };
 
-//     if (dragX >= prevX) {
-//       //   if (!this.options.loop && this.currentIndex === this.min) {
-//       //     this.updateSlide();
-//       //   } else {
-//       //     this.prev();
-//       //   }
-//       this.dragEnd();
-//     } else if (dragX <= nextX) {
-//       //   if (!this.options.loop && this.currentIndex === this.max) {
-//       //     this.updateSlide();
-//       //   } else {
-//       //     this.next();
-//       //   }
-//       this.dragEnd();
-//     } else {
-//       //   this.updateTransform(this.getTranslateX() - diffX);
-//     }
-//   };
+  private dragStartTouch = (e: TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    e.preventDefault();
+    this.startDrag(e.touches[0].clientX);
+  };
 
-//   public dragEnd = () => {
-//     this.isDrag = false;
-//     this.startX = 0;
-//     this.currentX = 0;
+  private startDrag(clientX: number) {
+    this.isDrag = true;
+    this.startX = clientX;
+    this.currentX = clientX;
 
-//     document.body.style.cursor = "auto";
-//     document.body.style.userSelect = "auto";
+    document.body.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
+  }
 
-//     // this.updateTransform(this.getTranslateX());
-//     // window.removeEventListener("mousemove", this.dragMove);
-//   };
-// }
+  private dragMoveMouse = (e: MouseEvent) => {
+    this.queueDrag(e.clientX);
+  };
 
-// export default Drag;
+  private dragMoveTouch = (e: TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    this.queueDrag(e.touches[0].clientX);
+  };
+
+  private queueDrag(clientX: number) {
+    if (!this.isDrag) return;
+
+    this.pendingX = clientX;
+
+    if (this.animationFrameId !== null) return;
+
+    this.animationFrameId = requestAnimationFrame(() => {
+      this.animationFrameId = null;
+      if (this.pendingX === null) return;
+
+      this.currentX = this.pendingX;
+      const diffX = this.startX - this.currentX;
+      const width = this.getWrapperWidth();
+      const baseX = this.getTranslateX();
+      const newX = baseX - diffX;
+
+      if (newX >= baseX + width / 2) {
+        this.onDragSlide("prev");
+        this.dragEnd();
+      } else if (newX <= baseX - width / 2) {
+        this.onDragSlide("next");
+        this.dragEnd();
+      } else {
+        this.onDragMove(newX);
+      }
+    });
+  }
+
+  private dragEnd = () => {
+    if (!this.isDrag) return;
+
+    this.isDrag = false;
+    this.startX = 0;
+    this.currentX = 0;
+    this.pendingX = null;
+
+    document.body.style.cursor = "auto";
+    document.body.style.userSelect = "auto";
+
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
+    this.onDragMove(this.getTranslateX());
+  };
+}

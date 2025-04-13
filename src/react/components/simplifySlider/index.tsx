@@ -54,7 +54,11 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
   return (
     <div className={"simplify-slider"}>
       <div className={"wrapper"}>
-        <ol className={"list"} ref={wrapperSlideRef}>
+        <ol
+          className={"list"}
+          ref={wrapperSlideRef}
+          // onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}
+        >
           {slides.map((slide, index) => cloneElement(slide, { key: index }))}
         </ol>
       </div>
