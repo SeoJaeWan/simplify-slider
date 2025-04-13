@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "simplify-slider/react": path.resolve(__dirname, "../../dist/react/"),
+      "simplify-slider/react": path.resolve(__dirname, "../../src/react/"),
     },
   },
 });

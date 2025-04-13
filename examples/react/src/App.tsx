@@ -6,7 +6,7 @@ function App() {
       options={{
         loop: true,
         drag: true,
-        duration: 10000,
+        duration: 1000,
       }}
     >
       <SimplifySlide>

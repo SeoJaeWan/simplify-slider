@@ -16,6 +16,8 @@ class MoveScroll {
   private min: number = 1;
   private max;
 
+  private bindTransitionEnd: () => void;
+
   private isDrag: boolean = false;
   private startX: number = 0;
   private currentX: number = 0;
@@ -26,6 +28,8 @@ class MoveScroll {
     this.options = { ...defaultOptions, ...options };
 
     this.max = length;
+
+    this.bindTransitionEnd = this.TransitionEnd.bind(this);
 
     this.init();
   }
@@ -49,99 +53,20 @@ class MoveScroll {
     this.wrapper.insertBefore(clonedLast, firstChild);
     this.wrapper.appendChild(clonedFirst);
 
-    this.updateTransform(this.getTranslateX());
+    this.setCurrentIndexTransform();
     this.setDrag();
   }
 
-  private dragStart = (e: MouseEvent) => {
-    if (this.isLoading) return;
-
-    this.isDrag = true;
-    this.startX = e.clientX;
-    this.currentX = e.clientX;
-
-    document.body.style.cursor = "grabbing";
-    document.body.style.userSelect = "none";
+  private disableTransition() {
     this.wrapper.style.transition = "none";
+  }
 
-    window.addEventListener("mousemove", this.dragMove);
-  };
-
-  private dragMove = (e: MouseEvent) => {
-    if (!this.isDrag) return;
-
-    this.currentX = e.clientX;
-    const width = this.getWrapperWidth();
-    const diffX = this.startX - this.currentX;
-
-    const prevX = this.getTranslateX() + width / 2;
-    const nextX = this.getTranslateX() - width / 2;
-
-    const currentX = this.getTranslateX() - diffX;
-
-    if (currentX >= prevX) {
-      if (!this.options.loop && this.currentIndex === this.min) {
-        this.updateSlide();
-      } else {
-        this.prev();
-      }
-      this.dragEnd();
-    } else if (currentX <= nextX) {
-      if (!this.options.loop && this.currentIndex === this.max) {
-        this.updateSlide();
-      } else {
-        this.next();
-      }
-      this.dragEnd();
-    } else {
-      this.updateTransform(this.getTranslateX() - diffX);
-    }
-  };
-
-  private dragEnd = () => {
-    this.isDrag = false;
-    this.startX = 0;
-    this.currentX = 0;
-
-    document.body.style.cursor = "auto";
-    document.body.style.userSelect = "auto";
-
-    this.updateTransform(this.getTranslateX());
-    window.removeEventListener("mousemove", this.dragMove);
-  };
-
-  private setDrag = () => {
-    if (!this.options.drag) return;
-
-    this.wrapper.addEventListener("mousedown", this.dragStart);
-    window.addEventListener("mouseup", this.dragEnd);
-  };
-
-  private TransitionEnd = () => {
-    this.wrapper.style.transition = "none";
-
-    if (this.currentIndex > this.max) {
-      this.currentIndex = 1;
-      this.updateTransform(this.getTranslateX());
-    } else if (this.currentIndex < this.min) {
-      this.currentIndex = this.length;
-      this.updateTransform(this.getTranslateX());
-    }
-
-    this.isLoading = false;
-    this.wrapper.removeEventListener("transitionend", this.TransitionEnd);
-  };
-
-  private clearTransition() {
-    this.wrapper.addEventListener("transitionend", this.TransitionEnd);
+  private updateTransform(x: number) {
+    this.wrapper.style.transform = `translateX(${x}px)`;
   }
 
   private getWrapperWidth() {
     return this.wrapper.offsetWidth;
-  }
-
-  private async updateCurrentIndex(index: number) {
-    this.currentIndex = this.currentIndex + index;
   }
 
   private getTranslateX() {
@@ -151,37 +76,139 @@ class MoveScroll {
     return translateX;
   }
 
-  private updateTransform(x: number) {
-    this.wrapper.style.transform = `translateX(${x}px)`;
+  private setCurrentIndexTransform() {
+    this.updateTransform(this.getTranslateX());
   }
 
-  private updateSlide() {
-    this.isLoading = true;
-    this.wrapper.style.transition = `transform ${this.options.duration}ms`;
-    this.updateTransform(this.getTranslateX());
+  private setBodyDraggingStyle(isDragging: boolean) {
+    document.body.style.cursor = isDragging ? "grabbing" : "auto";
+    document.body.style.userSelect = isDragging ? "none" : "auto";
+  }
 
+  private dragStart = (e: MouseEvent) => {
+    if (this.isLoading) return;
+
+    this.isDrag = true;
+    this.startX = e.clientX;
+    this.currentX = e.clientX;
+
+    this.setBodyDraggingStyle(true);
+    this.disableTransition();
+
+    window.addEventListener("mousemove", this.dragMove);
+  };
+
+  private checkOverPrevBound(currentX: number, width: number) {
+    return currentX >= this.getTranslateX() + width / 2;
+  }
+
+  private checkOverNextBound(currentX: number, width: number) {
+    return currentX <= this.getTranslateX() - width / 2;
+  }
+
+  private slideMovement(direction: "prev" | "next") {
+    if (direction === "prev") {
+      if (!this.options.loop && this.currentIndex === this.min) {
+        this.updateSlide(1000);
+      } else {
+        this.prev();
+      }
+    } else {
+      if (!this.options.loop && this.currentIndex === this.max) {
+        this.updateSlide(1000);
+      } else {
+        this.next();
+      }
+    }
+    this.dragEnd();
+  }
+
+  private dragMove = (e: MouseEvent) => {
+    if (!this.isDrag) return;
+
+    this.currentX = e.clientX;
+
+    const width = this.getWrapperWidth();
+    const diffX = this.startX - this.currentX;
+
+    const currentX = this.getTranslateX() - diffX;
+
+    if (this.checkOverPrevBound(currentX, width)) {
+      this.slideMovement("prev");
+    } else if (this.checkOverNextBound(currentX, width)) {
+      this.slideMovement("next");
+    } else {
+      this.updateTransform(currentX);
+    }
+  };
+
+  private dragEnd = () => {
+    if (this.isDrag) {
+      this.isDrag = false;
+      this.startX = 0;
+      this.currentX = 0;
+
+      this.setBodyDraggingStyle(false);
+
+      this.setCurrentIndexTransform();
+      window.removeEventListener("mousemove", this.dragMove);
+    }
+  };
+
+  private setDrag() {
+    if (!this.options.drag) return;
+
+    this.wrapper.addEventListener("mousedown", this.dragStart);
+    window.addEventListener("mouseup", this.dragEnd);
+  }
+
+  private TransitionEnd() {
+    this.disableTransition();
+
+    if (this.currentIndex > this.max) {
+      this.currentIndex = 1;
+      this.setCurrentIndexTransform();
+    } else if (this.currentIndex < this.min) {
+      this.currentIndex = this.length;
+      this.setCurrentIndexTransform();
+    }
+
+    this.isLoading = false;
+  }
+
+  private clearTransition() {
+    this.wrapper.addEventListener("transitionend", this.bindTransitionEnd);
+  }
+
+  private updateSlide(duration?: number) {
+    this.isLoading = true;
+    this.wrapper.style.transition = `transform ${duration}ms`;
+
+    this.setCurrentIndexTransform();
     this.clearTransition();
   }
 
-  public next(): void {
-    if (this.isLoading || (!this.options.loop && this.currentIndex === this.max)) return;
+  private moveTo(index: number) {
+    if (this.isLoading) return;
 
-    this.updateCurrentIndex(1);
-    this.updateSlide();
+    const isOutBounds = !this.options.loop && (index < this.min || index > this.max);
+
+    if (isOutBounds) return;
+
+    this.currentIndex = index;
+    this.updateSlide(this.options.duration);
+  }
+
+  public next(): void {
+    this.moveTo(this.currentIndex + 1);
   }
 
   public prev(): void {
-    if (this.isLoading || (!this.options.loop && this.currentIndex === this.min)) return;
-
-    this.updateCurrentIndex(-1);
-    this.updateSlide();
+    this.moveTo(this.currentIndex - 1);
   }
 
   public goTo(index: number): void {
-    if (this.isLoading) return;
-
-    this.currentIndex = index;
-    this.updateSlide();
+    this.moveTo(index);
   }
 
   public getCurrentIndex(): number {
