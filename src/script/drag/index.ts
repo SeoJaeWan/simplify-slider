@@ -1,15 +1,8 @@
-type Direction = "prev" | "next" | "move";
+import { Direction, DragOptions } from "../../types/drag.types";
 
-interface DragOptions {
-  element: HTMLElement;
-  getTranslateX: () => number;
-  getWrapperWidth: () => number;
-  onDragMove: (x: number) => void;
-  onDragSlide: (direction: Direction) => void;
-}
-
-export class Drag {
+class Drag {
   private isDrag = false;
+  private isUpdate = false;
   private startX = 0;
   private currentX = 0;
 
@@ -17,17 +10,13 @@ export class Drag {
   private pendingX: number | null = null;
 
   private readonly el: HTMLElement;
-  private readonly getTranslateX: () => number;
-  private readonly getWrapperWidth: () => number;
-  private readonly onDragMove: (x: number) => void;
-  private readonly onDragSlide: (dir: Direction) => void;
+  private readonly dragMove: (x: number) => void;
+  private readonly dragUpdate: (dir: Direction) => void;
 
   constructor(options: DragOptions) {
     this.el = options.element;
-    this.getTranslateX = options.getTranslateX;
-    this.getWrapperWidth = options.getWrapperWidth;
-    this.onDragMove = options.onDragMove;
-    this.onDragSlide = options.onDragSlide;
+    this.dragMove = options.dragMove;
+    this.dragUpdate = options.dragUpdate;
 
     this.dragStartMouse = this.dragStartMouse.bind(this);
     this.dragMoveMouse = this.dragMoveMouse.bind(this);
@@ -78,6 +67,8 @@ export class Drag {
 
     document.body.style.cursor = "grabbing";
     document.body.style.userSelect = "none";
+
+    this.isUpdate = false;
   }
 
   private dragMoveMouse(e: MouseEvent) {
@@ -102,23 +93,21 @@ export class Drag {
 
       this.currentX = this.pendingX;
       const diffX = this.startX - this.currentX;
-      const width = this.getWrapperWidth();
-      const baseX = this.getTranslateX();
-      const newX = baseX - diffX;
+      const width = this.el.offsetWidth;
 
-      if (newX >= baseX + width / 2) {
-        this.onDragSlide("prev");
-        this.dragEnd();
-      } else if (newX <= baseX - width / 2) {
-        this.onDragSlide("next");
-        this.dragEnd();
+      if (Math.abs(diffX) >= width / 2) {
+        if (diffX < 0) this.dragUpdate("prev");
+        else this.dragUpdate("next");
+        this.isUpdate = true;
+
+        this.resetDragState();
       } else {
-        this.onDragMove(newX);
+        this.dragMove(-diffX);
       }
     });
   }
 
-  private dragEnd() {
+  private resetDragState() {
     if (!this.isDrag) return;
 
     this.isDrag = false;
@@ -133,7 +122,14 @@ export class Drag {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
+  }
 
-    this.onDragMove(this.getTranslateX());
+  private dragEnd() {
+    this.resetDragState();
+
+    if (this.isUpdate) return;
+    this.dragUpdate("back");
   }
 }
+
+export default Drag;

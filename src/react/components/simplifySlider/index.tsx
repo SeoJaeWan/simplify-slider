@@ -2,11 +2,11 @@ import { Children, cloneElement, isValidElement, useEffect, useRef } from "react
 import type { ReactNode, PropsWithChildren, ReactElement } from "react";
 import SimplifySlide from "../simplifySlide";
 import "./simplifySlider.css";
-import MoveScroll from "../../../core/moveScroll";
-import { MoveScrollOptions } from "../../../types/moveScroll.types";
+import Core from "../../../script/core";
+import { ScrollOptions } from "../../../types/scroll.types";
 
 interface SimplifySliderProps extends PropsWithChildren {
-  options?: MoveScrollOptions;
+  options?: ScrollOptions;
 }
 
 /**
@@ -14,14 +14,14 @@ interface SimplifySliderProps extends PropsWithChildren {
  *
  * @component
  * @param {ReactNode} children - The slides and other elements to be rendered inside the slider.
- * @param {MoveScrollOptions} options - The options for configuring the slider behavior.
+ * @param {ScrollOptions} options - The options for configuring the slider behavior.
  */
 const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
   const { children, options } = props;
   const slides: ReactElement[] = [];
   const others: ReactNode[] = [];
   const wrapperSlideRef = useRef<HTMLOListElement>(null);
-  const simplifyCore = useRef<MoveScroll>(null);
+  const simplifyCore = useRef<Core>(null);
 
   Children.forEach(children, (child) => {
     if (isValidElement(child) && child.type === SimplifySlide) {
@@ -47,7 +47,7 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
     const wrapper = wrapperSlideRef.current;
 
     if (wrapper && !simplifyCore.current) {
-      simplifyCore.current = new MoveScroll(wrapper, slides.length, options);
+      simplifyCore.current = new Core(wrapper, slides.length, options);
     }
   }, [slides.length, options]);
 
