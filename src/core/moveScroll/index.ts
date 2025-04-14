@@ -25,6 +25,7 @@ class MoveScroll {
     this.options = { ...defaultOptions, ...options };
 
     this.max = length;
+    this.transitionEnd = this.transitionEnd.bind(this);
 
     this.init();
   }
@@ -104,7 +105,7 @@ class MoveScroll {
     this.updateTransform(this.getTranslateX());
   }
 
-  private transitionEnd = () => {
+  private transitionEnd() {
     this.disableTransition();
 
     if (this.currentIndex > this.max) {
@@ -116,7 +117,7 @@ class MoveScroll {
     }
 
     this.isLoading = false;
-  };
+  }
 
   private clearTransition() {
     this.wrapper.addEventListener("transitionend", this.transitionEnd);
@@ -142,11 +143,11 @@ class MoveScroll {
   }
 
   public next(): void {
-    this.moveTo(this.getCurrentIndex() + 1);
+    this.moveTo(this.currentIndex + 1);
   }
 
   public prev(): void {
-    this.moveTo(this.getCurrentIndex() - 1);
+    this.moveTo(this.currentIndex - 1);
   }
 
   public goTo(index: number): void {

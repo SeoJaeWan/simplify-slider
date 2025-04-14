@@ -29,6 +29,15 @@ export class Drag {
     this.onDragMove = options.onDragMove;
     this.onDragSlide = options.onDragSlide;
 
+    this.dragStartMouse = this.dragStartMouse.bind(this);
+    this.dragMoveMouse = this.dragMoveMouse.bind(this);
+
+    this.dragStartTouch = this.dragStartTouch.bind(this);
+    this.dragMoveTouch = this.dragMoveTouch.bind(this);
+
+    this.dragEnd = this.dragEnd.bind(this);
+
+    this.destroy();
     this.bindEvents();
   }
 
@@ -52,15 +61,15 @@ export class Drag {
     window.removeEventListener("touchmove", this.dragMoveTouch);
   }
 
-  private dragStartMouse = (e: MouseEvent) => {
+  private dragStartMouse(e: MouseEvent) {
     this.startDrag(e.clientX);
-  };
+  }
 
-  private dragStartTouch = (e: TouchEvent) => {
+  private dragStartTouch(e: TouchEvent) {
     if (e.touches.length !== 1) return;
     e.preventDefault();
     this.startDrag(e.touches[0].clientX);
-  };
+  }
 
   private startDrag(clientX: number) {
     this.isDrag = true;
@@ -71,14 +80,14 @@ export class Drag {
     document.body.style.userSelect = "none";
   }
 
-  private dragMoveMouse = (e: MouseEvent) => {
+  private dragMoveMouse(e: MouseEvent) {
     this.queueDrag(e.clientX);
-  };
+  }
 
-  private dragMoveTouch = (e: TouchEvent) => {
+  private dragMoveTouch(e: TouchEvent) {
     if (e.touches.length !== 1) return;
     this.queueDrag(e.touches[0].clientX);
-  };
+  }
 
   private queueDrag(clientX: number) {
     if (!this.isDrag) return;
@@ -109,7 +118,7 @@ export class Drag {
     });
   }
 
-  private dragEnd = () => {
+  private dragEnd() {
     if (!this.isDrag) return;
 
     this.isDrag = false;
@@ -126,5 +135,5 @@ export class Drag {
     }
 
     this.onDragMove(this.getTranslateX());
-  };
+  }
 }

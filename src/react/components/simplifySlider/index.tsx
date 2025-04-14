@@ -46,7 +46,7 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
   useEffect(() => {
     const wrapper = wrapperSlideRef.current;
 
-    if (wrapper) {
+    if (wrapper && !simplifyCore.current) {
       simplifyCore.current = new MoveScroll(wrapper, slides.length, options);
     }
   }, [slides.length, options]);
@@ -54,11 +54,7 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
   return (
     <div className={"simplify-slider"}>
       <div className={"wrapper"}>
-        <ol
-          className={"list"}
-          ref={wrapperSlideRef}
-          // onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}
-        >
+        <ol className={"list"} ref={wrapperSlideRef}>
           {slides.map((slide, index) => cloneElement(slide, { key: index }))}
         </ol>
       </div>
