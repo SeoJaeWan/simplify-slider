@@ -160,6 +160,8 @@ describe("moveScroll 테스트", () => {
   });
 
   it("drag 옵션이 false일 때, 50% 이상 드래그해도 아무 일도 발생하지 않는다.", () => {
+    jest.useFakeTimers();
+
     const moveScroll = new MoveScroll(wrapper, mockLength, {
       drag: false,
     });
@@ -167,6 +169,9 @@ describe("moveScroll 테스트", () => {
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
     window.dispatchEvent(new MouseEvent("mousemove", { clientX: 1000 }));
+
+    jest.runAllTimers();
+
     window.dispatchEvent(new MouseEvent("mouseup"));
     wrapper.dispatchEvent(new Event("transitionend"));
 
@@ -174,6 +179,8 @@ describe("moveScroll 테스트", () => {
   });
 
   it("drag 옵션이 true일 때, 왼쪽으로 50% 이상 드래그하면 다음 슬라이드로 이동한다.", () => {
+    jest.useFakeTimers();
+
     const moveScroll = new MoveScroll(wrapper, mockLength, {
       drag: true,
     });
@@ -181,6 +188,9 @@ describe("moveScroll 테스트", () => {
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
     window.dispatchEvent(new MouseEvent("mousemove", { clientX: 0 }));
+
+    jest.runAllTimers();
+
     window.dispatchEvent(new MouseEvent("mouseup"));
     wrapper.dispatchEvent(new Event("transitionend"));
 
@@ -188,6 +198,8 @@ describe("moveScroll 테스트", () => {
   });
 
   it("drag 옵션이 true일 때, 왼쪽으로 50% 미만으로 드래그하면 현재 슬라이드로 돌아온다.", () => {
+    jest.useFakeTimers();
+
     const moveScroll = new MoveScroll(wrapper, mockLength, {
       drag: true,
     });
@@ -195,6 +207,9 @@ describe("moveScroll 테스트", () => {
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
     window.dispatchEvent(new MouseEvent("mousemove", { clientX: 1 }));
+
+    jest.runAllTimers();
+
     window.dispatchEvent(new MouseEvent("mouseup"));
     wrapper.dispatchEvent(new Event("transitionend"));
 
@@ -202,6 +217,8 @@ describe("moveScroll 테스트", () => {
   });
 
   it("drag 옵션이 true일 때, 오른쪽으로 50% 이상 드래그하면 이전 슬라이드로 이동한다.", () => {
+    jest.useFakeTimers();
+
     const moveScroll = new MoveScroll(wrapper, mockLength, {
       drag: true,
     });
@@ -212,6 +229,9 @@ describe("moveScroll 테스트", () => {
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
     window.dispatchEvent(new MouseEvent("mousemove", { clientX: 1000 }));
+
+    jest.runAllTimers();
+
     window.dispatchEvent(new MouseEvent("mouseup"));
     wrapper.dispatchEvent(new Event("transitionend"));
 
