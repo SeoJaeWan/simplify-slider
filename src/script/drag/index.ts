@@ -1,4 +1,10 @@
-import { Direction, DragOptions } from "../../types/drag.types";
+import type { Direction } from "../../types/drag.types";
+
+interface DragOptions {
+  element: HTMLElement;
+  dragMove: (x: number) => void;
+  dragUpdate: (direction: Direction) => void;
+}
 
 class Drag {
   #isDrag = false;

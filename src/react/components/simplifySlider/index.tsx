@@ -1,9 +1,9 @@
-import { Children, cloneElement, isValidElement, useEffect, useRef } from "react";
-import type { ReactNode, PropsWithChildren, ReactElement } from "react";
+import { Children, cloneElement, forwardRef, isValidElement, useEffect, useRef } from "react";
 import SimplifySlide from "../simplifySlide";
-import "./simplifySlider.css";
+import "../../../css/simplifySlider.css";
 import Core from "../../../script/core";
-import { ScrollOptions } from "../../../types/scroll.types";
+import type { ReactNode, PropsWithChildren, ReactElement } from "react";
+import type { ScrollOptions } from "../../../types/scroll.types";
 
 interface SimplifySliderProps extends PropsWithChildren {
   options?: ScrollOptions;
@@ -14,9 +14,10 @@ interface SimplifySliderProps extends PropsWithChildren {
  *
  * @component
  * @param {ReactNode} children - The slides and other elements to be rendered inside the slider.
- * @param {ScrollOptions} options - The options for configuring the slider behavior.
+ * @param {ScrollOptions} [options] - The options for configuring the slider behavior. (optional)
+ * @param {Ref<Core>} ref - A reference to the Core instance for controlling the slider programmatically.
  */
-const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
+const SimplifySlider = forwardRef<Core, SimplifySliderProps>((props, ref) => {
   const { children, options } = props;
   const slides: ReactElement[] = [];
   const others: ReactNode[] = [];
@@ -47,7 +48,9 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
     const wrapper = wrapperSlideRef.current;
 
     if (wrapper && !simplifyCore.current) {
-      simplifyCore.current = new Core(wrapper, slides.length, options);
+      const core = new Core(wrapper, slides.length, options);
+      simplifyCore.current = core;
+      if (ref) ref = simplifyCore;
     }
   }, [slides.length, options]);
 
@@ -65,6 +68,6 @@ const SimplifySlider: React.FC<SimplifySliderProps> = (props) => {
       {others.map((other, index) => (isValidElement(other) ? cloneElement(other, { key: index }) : other))}
     </div>
   );
-};
+});
 
 export default SimplifySlider;

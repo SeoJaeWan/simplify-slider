@@ -1,8 +1,8 @@
-import { Direction } from "../../types/drag.types";
-import { ScrollOptions } from "../../types/scroll.types";
 import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
+import type { Direction } from "../../types/drag.types";
+import type { ScrollOptions } from "../../types/scroll.types";
 
 export const defaultOptions: ScrollOptions = {
   loop: false,
