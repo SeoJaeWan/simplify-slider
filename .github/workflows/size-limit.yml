@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - develop
+permissions:
+  pull-requests: write
 
 jobs:
   size:
