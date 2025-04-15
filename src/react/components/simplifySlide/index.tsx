@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import "./simplifySlide.css";
+import "../../../css/simplifySlide.css";
 
 const SimplifySlide: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
