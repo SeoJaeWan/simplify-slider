@@ -1,14 +1,18 @@
 import Core, { defaultOptions } from ".";
+import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
 import Autoplay from "../autoplay";
 
 describe("Core 테스트", () => {
   let wrapper: HTMLOListElement;
+  let blankWrapper: HTMLOListElement;
   const mockLength = 3;
 
   let now = 0;
 
   beforeEach(() => {
     wrapper = document.createElement("ol");
+    blankWrapper = document.createElement("ol");
+
     Object.defineProperty(wrapper, "offsetWidth", {
       value: 1000,
     });
@@ -39,6 +43,10 @@ describe("Core 테스트", () => {
   afterEach(() => {
     jest.useRealTimers();
     wrapper.remove();
+  });
+
+  it("Core 생성 시 슬라이드가 없으면 오류가 발생한다.", () => {
+    expect(() => new Core(blankWrapper, 0)).toThrow(InvalidSlideLengthError);
   });
 
   it("Core 생성 시 wrapper의 첫 번째 자식으로 마지막 슬라이드의 클론이 생성된다.", () => {
@@ -158,6 +166,24 @@ describe("Core 테스트", () => {
         drag: true,
       }),
     );
+  });
+
+  it("toGo()를 호출하면 index가 해당 값으로 변경되야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
+
+    expect(core.getCurrentIndex()).toBe(1);
+    core.goTo(3);
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(3);
+  });
+
+  it("toGo()를 호출할 때 index가 범위를 벗어나면 오류가 발생하고 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
+    expect(core.getCurrentIndex()).toBe(1);
+    expect(() => core.goTo(5)).toThrow(RangeError);
+
+    expect(core.getCurrentIndex()).toBe(1);
   });
 
   it("loop 옵션이 없을 때 마지막 슬라이드에서 next()를 호출하면 index는 유지되어야 한다.", () => {

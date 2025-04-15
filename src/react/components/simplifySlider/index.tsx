@@ -32,25 +32,13 @@ const SimplifySlider = forwardRef<Core, SimplifySliderProps>((props, ref) => {
     }
   });
 
-  const handleClickNext = () => {
-    if (simplifyCore.current) {
-      simplifyCore.current.next();
-    }
-  };
-
-  const handleClickPrev = () => {
-    if (simplifyCore.current) {
-      simplifyCore.current.prev();
-    }
-  };
-
   useEffect(() => {
     const wrapper = wrapperSlideRef.current;
 
     if (wrapper && !simplifyCore.current) {
       const core = new Core(wrapper, slides.length, options);
       simplifyCore.current = core;
-      if (ref) ref = simplifyCore;
+      if (ref && typeof ref !== "function") ref.current = core;
     }
   }, [slides.length, options]);
 
@@ -61,9 +49,6 @@ const SimplifySlider = forwardRef<Core, SimplifySliderProps>((props, ref) => {
           {slides.map((slide, index) => cloneElement(slide, { key: index }))}
         </ol>
       </div>
-
-      <button onClick={handleClickPrev}>이전</button>
-      <button onClick={handleClickNext}>이후</button>
 
       {others.map((other, index) => (isValidElement(other) ? cloneElement(other, { key: index }) : other))}
     </div>

@@ -4,6 +4,7 @@ import Move from "../move";
 import type { Direction } from "../../types/drag.types";
 import type { ScrollOptions } from "../../types/scroll.types";
 import Autoplay from "../autoplay";
+import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
 
 export const defaultOptions: ScrollOptions = {
   loop: false,
@@ -32,6 +33,10 @@ class Core {
     this.#wrapper = wrapper;
     this.#options = { ...defaultOptions, ...options } as Required<ScrollOptions>;
     this.#max = length;
+
+    if (length < 1) {
+      throw new InvalidSlideLengthError();
+    }
 
     this.#move = new Move(this.#wrapper, this.#options.duration);
     this.next = this.next.bind(this);
@@ -169,6 +174,7 @@ class Core {
   public goTo(index: number) {
     if (index < this.#min || index > this.#max)
       throw new RangeError(`Index out of bounds: ${index}. Valid range is ${this.#min} to ${this.#max}.`);
+    if (this.#currentIndex === index) return;
 
     this.#moveTo(index);
   }
