@@ -27,7 +27,20 @@ describe("Drag 테스트", () => {
     wrapper.remove();
   });
 
-  it("왼쪽으로 50%이상 드래그하고 mouseUp이벤트가 발생하면 dragUpdate()에 next 값을 가진 콜백이 호출된다.", () => {
+  it("마우스를 클릭하고 드래그 하지 않고 떼면 dragUpdate()에 back 값을 가진 콜백이 호출된다.", () => {
+    new Drag({
+      element: wrapper,
+      dragMove,
+      dragUpdate,
+    });
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(dragUpdate).toHaveBeenCalledWith("back");
+  });
+
+  it("왼쪽으로 50%이상 드래그하면 dragUpdate()에 next 값을 가진 콜백이 호출된다.", () => {
     new Drag({
       element: wrapper,
       dragMove,
@@ -44,7 +57,7 @@ describe("Drag 테스트", () => {
     expect(dragUpdate).toHaveBeenCalledWith("next");
   });
 
-  it("왼쪽으로 50%미만 드래그하고 mouseUp 이벤트가 발생하면 dragUpdate()에 back 값을 가진 콜백이 호출된다.", () => {
+  it("왼쪽으로 50%미만 드래그하면 dragUpdate()에 back 값을 가진 콜백이 호출된다.", () => {
     new Drag({
       element: wrapper,
       dragMove,
@@ -60,7 +73,7 @@ describe("Drag 테스트", () => {
     expect(dragUpdate).toHaveBeenCalledWith("back");
   });
 
-  it("오른쪽으로 50%이상 드래그하고 mouseUp 이벤트가 발생하면 dragUpdate()에 prev 값을 가진 콜백이 호출된다.", () => {
+  it("오른쪽으로 50%이상 드래그하면 dragUpdate()에 prev 값을 가진 콜백이 호출된다.", () => {
     new Drag({
       element: wrapper,
       dragMove,
@@ -77,7 +90,7 @@ describe("Drag 테스트", () => {
     expect(dragUpdate).toHaveBeenCalledWith("prev");
   });
 
-  it("오른쪽으로 50%미만 드래그하고 mouseUp 이벤트가 발생하면 dragUpdate()에 back 값을 가진 콜백이 호출된다.", () => {
+  it("오른쪽으로 50%미만 드래그하면 dragUpdate()에 back 값을 가진 콜백이 호출된다.", () => {
     new Drag({
       element: wrapper,
       dragMove,
@@ -106,5 +119,20 @@ describe("Drag 테스트", () => {
     jest.runAllTimers();
 
     expect(dragMove).toHaveBeenCalledWith(300);
+  });
+
+  it("destroy()가 호출되면 이벤트 리스너가 제거된다.", () => {
+    const drag = new Drag({
+      element: wrapper,
+      dragMove,
+      dragUpdate,
+    });
+
+    drag.destroy();
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(dragUpdate).not.toHaveBeenCalled();
   });
 });

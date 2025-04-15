@@ -1,166 +1,384 @@
-// import MoveScroll from ".";
+import Core, { defaultOptions } from ".";
 
-// describe("moveScroll 테스트", () => {
-//   let wrapper: HTMLOListElement;
+describe("Core 테스트", () => {
+  let wrapper: HTMLOListElement;
+  const mockLength = 3;
 
-//   const mockLength = 3;
+  beforeEach(() => {
+    wrapper = document.createElement("ol");
+    Object.defineProperty(wrapper, "offsetWidth", {
+      value: 1000,
+    });
 
-//   beforeEach(() => {
-//     wrapper = document.createElement("ol");
+    for (let i = 0; i < mockLength; i++) {
+      const listItem = document.createElement("li");
+      listItem.textContent = `item ${i + 1}`;
 
-//     Object.defineProperty(wrapper, "offsetWidth", {
-//       value: 1000,
-//     });
+      wrapper.appendChild(listItem);
+    }
 
-//     for (let i = 0; i < mockLength; i++) {
-//       const listItem = document.createElement("li");
-//       wrapper.appendChild(listItem);
-//     }
+    jest.useFakeTimers();
+    global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
+    global.cancelAnimationFrame = (id) => clearTimeout(id);
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+    wrapper.remove();
+  });
 
-//     jest.useFakeTimers();
+  it("Core 생성 시 wrapper의 첫 번째 자식으로 마지막 슬라이드의 클론이 생성된다.", () => {
+    new Core(wrapper, mockLength);
+    const clonedFirst = wrapper.firstElementChild;
 
-//     global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
-//     global.cancelAnimationFrame = (id) => clearTimeout(id);
-//   });
+    expect(clonedFirst?.classList.contains("cloned")).toBe(true);
+    expect(clonedFirst?.textContent).toBe("item 3");
+  });
 
-//   afterEach(() => {
-//     jest.useRealTimers();
+  it("Core 생성 시 wrapper의 마지막 자식으로 첫 번째 슬라이드의 클론이 생성된다.", () => {
+    new Core(wrapper, mockLength);
+    const clonedLast = wrapper.lastElementChild;
 
-//     wrapper.remove();
-//   });
+    expect(clonedLast?.classList.contains("cloned")).toBe(true);
+    expect(clonedLast?.textContent).toBe("item 1");
+  });
 
-//   it("MoveScroll 생성 시 clone 요소가 생성되고, transform이 첫 번째 슬라이드 위치를 나타낸다.", () => {
-//     new MoveScroll(wrapper, mockLength);
+  it("getCurrentIndex()가 호출되면 현재 슬라이드의 index 값을 얻을 수 있다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//     const clonedElements = wrapper.querySelectorAll(".cloned");
-//     expect(clonedElements.length).toBe(2);
+    expect(core.getCurrentIndex()).toBe(1);
+  });
 
-//     expect(wrapper.style.transform).toBe("translateX(-1000px)");
-//   });
+  it("next()를 호출하면 index가 증가해야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//   it("next 메서드를 호출하면 index가 증가해야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
-//     moveScroll.next();
+    expect(core.getCurrentIndex()).toBe(1);
+    core.next();
 
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
-//   });
+    expect(core.getCurrentIndex()).toBe(2);
+  });
 
-//   it("duration 시간 이전에 다시 호출해도 index는 증가하지 않아야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
+  it("prev()를 호출하면 index가 감소해야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//     moveScroll.next();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
+    core.next();
+    expect(core.getCurrentIndex()).toBe(2);
 
-//     moveScroll.next();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
-//   });
+    wrapper.dispatchEvent(new Event("transitionend"));
 
-//   it("duration 시간 후에 다시 호출하면 index가 증가해야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
+    core.prev();
+    expect(core.getCurrentIndex()).toBe(1);
+  });
 
-//     moveScroll.next();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
+  it("goTo()를 호출하면 index가 해당 값으로 변경되야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//     wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(1);
+    core.goTo(3);
 
-//     moveScroll.next();
-//     expect(moveScroll.getCurrentIndex()).toBe(3);
-//   });
+    expect(core.getCurrentIndex()).toBe(3);
+  });
 
-//   it("loop 옵션이 없을 때 마지막 슬라이드에서 next를 호출하면 index는 유지되어야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength, {
-//       loop: false,
-//     });
+  it("goTo()를 호출할 때 index가 범위를 벗어나면 오류가 발생하고 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
+    expect(core.getCurrentIndex()).toBe(1);
+    expect(() => core.goTo(5)).toThrow(RangeError);
 
-//     for (let i = 0; i < mockLength; i++) {
-//       moveScroll.next();
-//       wrapper.dispatchEvent(new Event("transitionend"));
-//     }
+    expect(core.getCurrentIndex()).toBe(1);
+  });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(3);
-//   });
+  it("next()를 호출할 때 duration 시간 이전에 다시 호출해도 index는 증가하지 않아야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//   it("loop 옵션이 있을 때 마지막 슬라이드에서 next를 호출하면 첫 번째 슬라이드로 돌아가야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength, {
-//       loop: true,
-//     });
-//     for (let i = 0; i < mockLength; i++) {
-//       moveScroll.next();
-//       wrapper.dispatchEvent(new Event("transitionend"));
-//     }
-//     expect(moveScroll.getCurrentIndex()).toBe(1);
-//   });
+    core.next();
+    expect(core.getCurrentIndex()).toBe(2);
 
-//   it("prev 메서드를 호출하면 index가 감소해야 한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
+    core.next();
+    expect(core.getCurrentIndex()).toBe(2);
+  });
 
-//     moveScroll.next();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+  it("next()를 호출할 때 duration 시간 후에 다시 호출하면 index가 증가해야 한다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
+    core.next();
+    expect(core.getCurrentIndex()).toBe(2);
 
-//     moveScroll.prev();
-//     expect(moveScroll.getCurrentIndex()).toBe(1);
-//   });
+    wrapper.dispatchEvent(new Event("transitionend"));
 
-//   it("prev 메서드를 호출 시 초기값으로 설정된 duration 시간 전엔 다시 호출해도 감소하지 않는다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
+    core.next();
+    expect(core.getCurrentIndex()).toBe(3);
+  });
 
-//     moveScroll.next();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+  it("옵션을 설정하지 않으면 기본 옵션이 적용된다.", () => {
+    const core = new Core(wrapper, mockLength);
 
-//     moveScroll.next();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getOptions()).toEqual(defaultOptions);
+  });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(3);
+  it("duration 옵션을 설정하면 해당 값으로 duration이 설정된다.", () => {
+    const duration = 2000;
+    const core = new Core(wrapper, mockLength, { duration });
 
-//     moveScroll.prev();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        duration,
+      }),
+    );
+  });
 
-//     moveScroll.prev();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
-//   });
+  it("loop 옵션을 설정하면 해당 값으로 loop이 설정된다.", () => {
+    const core = new Core(wrapper, mockLength, { loop: true });
 
-//   it("prev 메서드를 호출 시 초기값으로 설정된 duration 시간 후에 다시 호출하면 감소한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength);
-//     moveScroll.next();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        loop: true,
+      }),
+    );
+  });
 
-//     moveScroll.next();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+  it("drag 옵션을 설정하면 해당 값으로 drag이 설정된다.", () => {
+    const core = new Core(wrapper, mockLength, { drag: true });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(3);
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        drag: true,
+      }),
+    );
+  });
 
-//     moveScroll.prev();
-//     expect(moveScroll.getCurrentIndex()).toBe(2);
+  it("loop 옵션이 없을 때 마지막 슬라이드에서 next()를 호출하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: false,
+    });
 
-//     wrapper.dispatchEvent(new Event("transitionend"));
+    core.goTo(mockLength);
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(3);
 
-//     moveScroll.prev();
-//     expect(moveScroll.getCurrentIndex()).toBe(1);
-//   });
+    core.next();
+    expect(core.getCurrentIndex()).toBe(3);
+  });
 
-//   it("loop 옵션이 없다면 prev 메서드를 첫 번째 슬라이드에서 호출 시 유지된다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength, {
-//       loop: false,
-//     });
+  it("loop 옵션이 있을 때 마지막 슬라이드에서 next()를 호출하면 첫 번째 슬라이드로 돌아가야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: true,
+    });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(1);
+    core.goTo(mockLength);
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(3);
 
-//     moveScroll.prev();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+    core.next();
+    expect(core.getCurrentIndex()).toBe(1);
+  });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(1);
-//   });
+  it("loop 옵션이 없을 때 첫 번째 슬라이드에서 prev()를 호출하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: false,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
 
-//   it("loop 옵션이 있다면 prev 메서드를 첫 번째 슬라이드에서 호출 시 마지막 슬라이드로 이동한다.", () => {
-//     const moveScroll = new MoveScroll(wrapper, mockLength, {
-//       loop: true,
-//     });
+    core.prev();
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(1);
+  });
 
-//     moveScroll.prev();
-//     wrapper.dispatchEvent(new Event("transitionend"));
+  it("loop 옵션이 있을 때 첫 번째 슬라이드에서 prev()를 호출하면 마지막 슬라이드로 이동해야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: true,
+    });
 
-//     expect(moveScroll.getCurrentIndex()).toBe(3);
-//   });
-// });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.prev();
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(3);
+  });
+
+  it("drag 옵션이 false일 때, Drag 클래스가 생성되지 않아야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: false,
+    });
+
+    const drag = core.getIsDraggable();
+    expect(drag).toBe(false);
+  });
+
+  it("drag 옵션이 true일 때, Drag 클래스가 생성되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+
+    const drag = core.getIsDraggable();
+    expect(drag).toBe(true);
+  });
+
+  it("drag 옵션이 true일 때, 왼쪽으로 50%이상 드래그하면 index가 증가해야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 0 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(2);
+  });
+
+  it("drag 옵션이 true일 때, 왼쪽으로 50%미만 드래그하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 1 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("drag 옵션이 true일 때, 오른쪽으로 50%이상 드래그하면 index가 감소해야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.next();
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(2);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 500 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("drag 옵션이 true일 때, 오른쪽으로 50%미만 드래그하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.next();
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(2);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 499 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(2);
+  });
+
+  it("drag, loop 옵션이 true일 때, 마지막 슬라이드에서 왼쪽으로 50%이상 드래그하면 첫 번째 슬라이드로 이동해야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      loop: true,
+    });
+    core.goTo(mockLength);
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(3);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 0 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("drag 옵션은 true이지만 loop 옵션이 false일 때, 마지막 슬라이드에서 왼쪽으로 50%이상 드래그하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      loop: false,
+    });
+
+    core.goTo(mockLength);
+    wrapper.dispatchEvent(new Event("transitionend"));
+    expect(core.getCurrentIndex()).toBe(3);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 0 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(3);
+  });
+
+  it("drag, loop 옵션이 true일 때, 첫 번째 슬라이드에서 오른쪽으로 50%이상 드래그하면 마지막 슬라이드로 이동해야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      loop: true,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 500 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(3);
+  });
+
+  it("drag 옵션은 true이지만 loop 옵션이 false일 때, 첫 번째 슬라이드에서 오른쪽으로 50%이상 드래그하면 index는 유지되어야 한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      loop: false,
+    });
+    expect(core.getCurrentIndex()).toBe(1);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 500 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("destroy()가 호출되면 drag 클래스가 제거되고, 이벤트 리스너가 제거된다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+    });
+
+    const drag = core.getIsDraggable();
+    expect(drag).toBe(true);
+
+    core.destroy();
+
+    const dragAfterDestroy = core.getIsDraggable();
+    expect(dragAfterDestroy).toBe(false);
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 0 }));
+
+    jest.runAllTimers();
+
+    window.dispatchEvent(new MouseEvent("mouseup"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+});
