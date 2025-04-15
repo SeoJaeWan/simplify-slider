@@ -6,10 +6,11 @@ on:
       - develop
 
 jobs:
-  size:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v1
-      - uses: andresz1/size-limit-action@v1.3.2
+      - uses: actions/checkout@v2
+      - uses: preactjs/compressed-size-action@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
