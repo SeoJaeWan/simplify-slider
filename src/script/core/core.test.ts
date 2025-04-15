@@ -1,8 +1,11 @@
 import Core, { defaultOptions } from ".";
+import Autoplay from "../autoplay";
 
 describe("Core 테스트", () => {
   let wrapper: HTMLOListElement;
   const mockLength = 3;
+
+  let now = 0;
 
   beforeEach(() => {
     wrapper = document.createElement("ol");
@@ -18,8 +21,20 @@ describe("Core 테스트", () => {
     }
 
     jest.useFakeTimers();
-    global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
-    global.cancelAnimationFrame = (id) => clearTimeout(id);
+
+    now = 0;
+    global.performance.now = () => now;
+
+    global.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+      return setTimeout(() => {
+        now += 100;
+        cb(now);
+      }, 100);
+    }) as unknown as typeof requestAnimationFrame;
+
+    global.cancelAnimationFrame = (id: number) => {
+      clearTimeout(id);
+    };
   });
   afterEach(() => {
     jest.useRealTimers();
@@ -380,5 +395,97 @@ describe("Core 테스트", () => {
     window.dispatchEvent(new MouseEvent("mouseup"));
 
     expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션이 false일 때, interval에 따라 자동으로 index가 증가하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        enabled: false,
+        interval: 1000,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션이 true일 때, interval에 따라 자동으로 index가 증가한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        enabled: true,
+        interval: 1000,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(2);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(3);
+  });
+
+  it("autoplay 옵션이 true고 direction이 left일 때, interval에 따라 자동으로 index가 감소한다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: true,
+      autoplay: {
+        enabled: true,
+        interval: 1000,
+        direction: "left",
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(3);
+    jest.runAllTimers();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(2);
+  });
+
+  it("autoplay 옵션이 true고 drag 옵션이 true일 때, drag 이벤트가 발생하면 autoplay의 stop()이 호출된다.", () => {
+    const stopSpy = jest.spyOn(Autoplay.prototype, "stop");
+
+    new Core(wrapper, mockLength, {
+      loop: true,
+      drag: true,
+      autoplay: {
+        enabled: true,
+        interval: 1000,
+      },
+    });
+
+    wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
+    window.dispatchEvent(new MouseEvent("mousemove", { clientX: 1 }));
+
+    expect(stopSpy).toHaveBeenCalled();
+  });
+
+  it("autoplay 옵션에서 onProgress가 설정되면, autoplay 진행 중에 해당 콜백이 호출된다.", () => {
+    const progressCallback = jest.fn();
+    new Core(wrapper, mockLength, {
+      autoplay: {
+        enabled: true,
+        interval: 1000,
+        onProgress: progressCallback,
+      },
+    });
+
+    jest.runAllTimers();
+
+    expect(progressCallback).toHaveBeenCalledTimes(9);
   });
 });

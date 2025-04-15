@@ -3,10 +3,15 @@ import Drag from "../drag";
 import Move from "../move";
 import type { Direction } from "../../types/drag.types";
 import type { ScrollOptions } from "../../types/scroll.types";
+import Autoplay from "../autoplay";
 
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
+  autoplay: {
+    enabled: false,
+    interval: 3000,
+  },
   duration: 500,
 };
 class Core {
@@ -20,6 +25,7 @@ class Core {
   #max;
 
   #drag?: Drag;
+  #autoplay?: Autoplay;
   #move: Move;
 
   constructor(wrapper: HTMLOListElement, length: number, options?: ScrollOptions) {
@@ -35,6 +41,7 @@ class Core {
     this.getOptions = this.getOptions.bind(this);
 
     this.#init();
+    this.#initAutoplay();
   }
 
   #init() {
@@ -69,8 +76,34 @@ class Core {
     });
   }
 
+  #initAutoplay() {
+    if (!this.getIsAutoplay()) return;
+
+    this.#autoplay = new Autoplay(this.#options.autoplay?.interval);
+    this.#autoplayStart();
+  }
+
+  #autoplayStart = () => {
+    if (!this.#autoplay) return;
+
+    this.#autoplay.start(() => {
+      if (this.#options.autoplay?.direction === "left") {
+        this.prev();
+      } else {
+        this.next();
+      }
+    }, this.#options.autoplay.onProgress);
+  };
+
+  #autoplayStop = () => {
+    if (!this.#autoplay) return;
+
+    this.#autoplay.stop();
+  };
+
   #dragMove = (diffX: number) => {
     this.#move.moveByOffset(diffX, this.#currentIndex);
+    this.#autoplayStop();
   };
 
   #dragUpdate = (direction: Direction) => {
@@ -80,6 +113,8 @@ class Core {
       this.#currentIndex = this.#currentIndex - 1;
     } else if (direction === "next" && (this.#options.loop || this.#currentIndex !== this.#max)) {
       this.#currentIndex = this.#currentIndex + 1;
+    } else {
+      this.#autoplayStart();
     }
 
     this.#clearTransition();
@@ -103,6 +138,7 @@ class Core {
     this.#isLoading = false;
 
     this.#wrapper.removeEventListener("transitionend", this.#transitionEnd);
+    this.#autoplayStart();
   };
 
   #clearTransition() {
@@ -155,6 +191,10 @@ class Core {
     }
 
     this.#drag = undefined;
+  }
+
+  public getIsAutoplay() {
+    return this.#options.autoplay?.enabled;
   }
 }
 
