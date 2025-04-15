@@ -9,15 +9,7 @@ jobs:
   size:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Clean install
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-
-      - name: Run Size Limit
-        uses: andresz1/size-limit-action@v1.3.2
+      - uses: actions/checkout@v4
+      - uses: andresz1/size-limit-action@v1.3.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
