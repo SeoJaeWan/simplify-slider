@@ -80,5 +80,8 @@
     "*.{json,md,yml}": [
       "prettier --cache --write"
     ]
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.40.0"
   }
 }
