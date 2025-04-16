@@ -9,22 +9,23 @@ function App() {
       options={{
         loop: true,
         drag: true,
-        duration: 1000,
+        duration: 10000,
         autoplay: {
           enabled: true,
           interval: 1000,
           direction: "right",
+          rolling: true,
         },
       }}
     >
       <SimplifySlide>
-        <div style={{ height: "200px" }}>1</div>
+        <div style={{ height: "200px", background: "red" }}>1</div>
       </SimplifySlide>
       <SimplifySlide>
-        <div style={{ height: "200px" }}>2</div>
+        <div style={{ height: "200px", background: "blue" }}>2</div>
       </SimplifySlide>
       <SimplifySlide>
-        <div style={{ height: "200px" }}>3</div>
+        <div style={{ height: "200px", background: "green" }}>3</div>
       </SimplifySlide>
 
       <button onClick={prev}>이전</button>

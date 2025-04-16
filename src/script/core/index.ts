@@ -2,23 +2,28 @@ import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
 import type { Direction } from "../../types/drag.types";
-import type { ScrollOptions } from "../../types/scroll.types";
+import type { AutoplayOptions, ScrollOptions } from "../../types/scroll.types";
 import Autoplay from "../autoplay";
 import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+
+const defaultAutoplayOptions: AutoplayOptions = {
+  interval: 3000,
+  direction: "right",
+  rolling: false,
+  onProgress: () => {},
+};
 
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
-  autoplay: {
-    enabled: false,
-    interval: 3000,
-  },
+  autoplay: defaultAutoplayOptions,
   duration: 500,
-};
+} as const;
+
 class Core {
   #wrapper: HTMLOListElement;
   #currentIndex: number = 1;
-  #options: Required<ScrollOptions>;
+  #options: ScrollOptions = defaultOptions;
 
   #isLoading: boolean = false;
 
@@ -29,9 +34,17 @@ class Core {
   #autoplay?: Autoplay;
   #move: Move;
 
-  constructor(wrapper: HTMLOListElement, length: number, options?: ScrollOptions) {
+  constructor(wrapper: HTMLOListElement, length: number, options?: Partial<ScrollOptions>) {
     this.#wrapper = wrapper;
-    this.#options = { ...defaultOptions, ...options } as Required<ScrollOptions>;
+    this.#options = {
+      loop: options?.loop ?? defaultOptions.loop,
+      drag: options?.drag ?? defaultOptions.drag,
+      autoplay: {
+        ...defaultAutoplayOptions,
+        ...options?.autoplay,
+      },
+      duration: options?.duration ?? defaultOptions.duration,
+    };
     this.#max = length;
 
     if (length < 1) {
@@ -46,6 +59,7 @@ class Core {
     this.getOptions = this.getOptions.bind(this);
 
     this.#init();
+    this.#initDrag();
     this.#initAutoplay();
   }
 
@@ -67,8 +81,6 @@ class Core {
 
     this.#wrapper.insertBefore(clonedLast, firstChild);
     this.#wrapper.appendChild(clonedFirst);
-
-    this.#initDrag();
   }
 
   #initDrag() {
@@ -83,8 +95,12 @@ class Core {
 
   #initAutoplay() {
     if (!this.getIsAutoplay()) return;
+    if (this.#options.autoplay.rolling) {
+      this.#wrapper.style.transitionTimingFunction = "linear";
+      this.#options.autoplay.interval = 0;
+    }
 
-    this.#autoplay = new Autoplay(this.#options.autoplay?.interval);
+    this.#autoplay = new Autoplay(this.#options.autoplay.interval);
     this.#autoplayStart();
   }
 
@@ -200,7 +216,7 @@ class Core {
   }
 
   public getIsAutoplay() {
-    return this.#options.autoplay?.enabled;
+    return this.#options.autoplay;
   }
 }
 

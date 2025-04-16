@@ -29,6 +29,7 @@ class Move {
 
   #updateSlide(index: number, duration: number) {
     this.#wrapper.style.transition = `transform ${duration}ms`;
+    this.#wrapper.style.transitionTimingFunction = "linear";
 
     this.moveToIndex(index);
   }
