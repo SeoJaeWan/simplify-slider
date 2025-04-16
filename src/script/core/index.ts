@@ -1,10 +1,10 @@
 import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
-import type { Direction } from "../../types/drag.types";
-import type { AutoplayOptions, ScrollOptions } from "../../types/scroll.types";
 import Autoplay from "../autoplay";
 import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+import type { Direction } from "../../types/drag.types";
+import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 
 const defaultAutoplayOptions: AutoplayOptions = {
   interval: 3000,
@@ -16,9 +16,8 @@ const defaultAutoplayOptions: AutoplayOptions = {
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
-  autoplay: defaultAutoplayOptions,
   duration: 500,
-} as const;
+};
 
 class Core {
   #wrapper: HTMLOListElement;
@@ -34,9 +33,13 @@ class Core {
   #autoplay?: Autoplay;
   #move: Move;
 
-  constructor(wrapper: HTMLOListElement, length: number, options?: Partial<ScrollOptions>) {
+  constructor(wrapper: HTMLOListElement, length: number, options?: SimplifySliderOptions) {
     this.#wrapper = wrapper;
-    this.#options = { ...defaultOptions, ...options };
+    this.#options = {
+      ...defaultOptions,
+      ...options,
+      autoplay: options?.autoplay ? { ...defaultAutoplayOptions, ...options.autoplay } : undefined,
+    };
     this.#max = length;
 
     if (length < 1) {
@@ -73,10 +76,13 @@ class Core {
 
     this.#wrapper.insertBefore(clonedLast, firstChild);
     this.#wrapper.appendChild(clonedFirst);
+
+    this.#updateTransition();
   }
 
   #initDrag() {
     if (!this.#options.drag) return;
+    if (this.#getIsRolling()) return;
 
     this.#drag = new Drag({
       element: this.#wrapper,
@@ -86,9 +92,8 @@ class Core {
   }
 
   #initAutoplay() {
-    if (!this.getIsAutoplay()) return;
-    if (this.#options.autoplay.rolling) {
-      this.#wrapper.style.transitionTimingFunction = "linear";
+    if (!this.#options.autoplay) return;
+    if (this.#getIsRolling()) {
       this.#options.autoplay.interval = 0;
     }
 
@@ -96,14 +101,22 @@ class Core {
     this.#autoplayStart();
   }
 
+  #updateTransition = () => {
+    if (this.#getIsRolling()) {
+      this.#wrapper.style.transitionTimingFunction = "linear";
+    } else {
+      this.#wrapper.style.transitionTimingFunction = "ease";
+    }
+  };
+
   #autoplayStart = () => {
-    if (!this.#autoplay) return;
+    if (!this.#autoplay || !this.#options.autoplay) return;
 
     this.#autoplay.start(() => {
       if (this.#options.autoplay?.direction === "left") {
-        this.prev();
+        this.#forcePrev();
       } else {
-        this.next();
+        this.#forceNext();
       }
     }, this.#options.autoplay.onProgress);
   };
@@ -160,9 +173,11 @@ class Core {
 
   #moveTo(index: number) {
     if (this.#isLoading) return;
-    const isOutBounds = !this.#options.loop && (index < this.#min || index > this.#max);
 
+    const isOutBounds = !this.#options.loop && (index < this.#min || index > this.#max);
     if (isOutBounds) return;
+
+    this.#updateTransition();
 
     this.#clearTransition();
     this.#currentIndex = index;
@@ -171,12 +186,25 @@ class Core {
     this.#move.goToIndex(index);
   }
 
-  public next() {
+  #forceNext = () => {
     this.#moveTo(this.#currentIndex + 1);
+  };
+
+  #forcePrev = () => {
+    this.#moveTo(this.#currentIndex - 1);
+  };
+
+  #safeMoveTo = (index: number) => {
+    if (this.#getIsRolling()) return;
+    this.#moveTo(index);
+  };
+
+  public next() {
+    this.#safeMoveTo(this.#currentIndex + 1);
   }
 
   public prev() {
-    this.#moveTo(this.#currentIndex - 1);
+    this.#safeMoveTo(this.#currentIndex - 1);
   }
 
   public goTo(index: number) {
@@ -184,7 +212,7 @@ class Core {
       throw new RangeError(`Index out of bounds: ${index}. Valid range is ${this.#min} to ${this.#max}.`);
     if (this.#currentIndex === index) return;
 
-    this.#moveTo(index);
+    this.#safeMoveTo(index);
   }
 
   public getCurrentIndex() {
@@ -210,6 +238,10 @@ class Core {
   public getIsAutoplay() {
     return this.#options.autoplay;
   }
+
+  #getIsRolling = () => {
+    return this.#options?.autoplay?.rolling;
+  };
 }
 
 export default Core;

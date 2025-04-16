@@ -8,7 +8,7 @@ export interface ScrollOptions {
   loop: boolean;
   duration: number;
   drag: boolean;
-  autoplay: AutoplayOptions;
+  autoplay?: AutoplayOptions;
 }
 
 /**
@@ -21,4 +21,8 @@ export interface AutoplayOptions {
   direction: "right" | "left";
   rolling: boolean;
   onProgress: (progress: number) => void;
+}
+
+export interface SimplifySliderOptions extends Partial<Omit<ScrollOptions, "autoplay">> {
+  autoplay?: Partial<AutoplayOptions>;
 }

@@ -3,10 +3,10 @@ import SimplifySlide from "../simplifySlide";
 import "../../../css/simplifySlider.css";
 import Core from "../../../script/core";
 import type { ReactNode, PropsWithChildren, ReactElement } from "react";
-import type { ScrollOptions } from "../../../types/scroll.types";
+import type { SimplifySliderOptions } from "../../../types/scroll.types";
 
 interface SimplifySliderProps extends PropsWithChildren {
-  options?: ScrollOptions;
+  options?: SimplifySliderOptions;
 }
 
 /**
@@ -14,7 +14,7 @@ interface SimplifySliderProps extends PropsWithChildren {
  *
  * @component
  * @param {ReactNode} children - The slides and other elements to be rendered inside the slider.
- * @param {ScrollOptions} [options] - The options for configuring the slider behavior. (optional)
+ * @param {SimplifySliderOptions} [options] - The options for configuring the slider behavior. (optional)
  * @param {Ref<Core>} ref - A reference to the Core instance for controlling the slider programmatically.
  */
 const SimplifySlider = forwardRef<Core, SimplifySliderProps>((props, ref) => {

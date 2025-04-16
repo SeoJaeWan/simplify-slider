@@ -423,13 +423,8 @@ describe("Core 테스트", () => {
     expect(core.getCurrentIndex()).toBe(1);
   });
 
-  it("autoplay 옵션이 false일 때, interval에 따라 자동으로 index가 증가하지 않는다.", () => {
-    const core = new Core(wrapper, mockLength, {
-      autoplay: {
-        enabled: false,
-        interval: 1000,
-      },
-    });
+  it("autoplay 옵션이 없을 때, 자동으로 index가 증가하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {});
 
     expect(core.getCurrentIndex()).toBe(1);
     jest.runAllTimers();
@@ -442,10 +437,9 @@ describe("Core 테스트", () => {
     expect(core.getCurrentIndex()).toBe(1);
   });
 
-  it("autoplay 옵션이 true일 때, interval에 따라 자동으로 index가 증가한다.", () => {
+  it("autoplay 옵션이 있을 때, interval 시간 마다 자동으로 index가 증가한다.", () => {
     const core = new Core(wrapper, mockLength, {
       autoplay: {
-        enabled: true,
         interval: 1000,
       },
     });
@@ -465,7 +459,6 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       loop: true,
       autoplay: {
-        enabled: true,
         interval: 1000,
         direction: "left",
       },
@@ -489,7 +482,6 @@ describe("Core 테스트", () => {
       loop: true,
       drag: true,
       autoplay: {
-        enabled: true,
         interval: 1000,
       },
     });
@@ -504,7 +496,6 @@ describe("Core 테스트", () => {
     const progressCallback = jest.fn();
     new Core(wrapper, mockLength, {
       autoplay: {
-        enabled: true,
         interval: 1000,
         onProgress: progressCallback,
       },
@@ -513,5 +504,116 @@ describe("Core 테스트", () => {
     jest.runAllTimers();
 
     expect(progressCallback).toHaveBeenCalledTimes(9);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, transitionTimingFunction은 linear로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(wrapper.style.transitionTimingFunction).toBe("linear");
+  });
+
+  it("autoplay 옵션에서 rolling이 false일 때, transitionTimingFunction은 ease로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: false,
+      },
+    });
+
+    expect(wrapper.style.transitionTimingFunction).toBe("ease");
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, next()가 호출되면 index가 증가하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.next();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, prev()가 호출되면 index가 감소하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: true,
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.prev();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, goTo()가 호출되면 index가 변경되지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.goTo(3);
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, drag 클래스가 생성되지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getIsDraggable()).toBe(false);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, interval 값은 0이 된다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        interval: 1000,
+        rolling: true,
+      },
+    });
+
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        autoplay: expect.objectContaining({
+          interval: 0,
+        }),
+      }),
+    );
+  });
+
+  it("autoplay 옵션에서 rolling이 false일 때, interval 값은 설정한 값이 된다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        interval: 1000,
+        rolling: false,
+      },
+    });
+
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        autoplay: expect.objectContaining({
+          interval: 1000,
+        }),
+      }),
+    );
   });
 });

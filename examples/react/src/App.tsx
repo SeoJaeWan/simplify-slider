@@ -10,12 +10,6 @@ function App() {
         loop: true,
         drag: true,
         duration: 10000,
-        autoplay: {
-          interval: 1000,
-          direction: "right",
-          rolling: false,
-          onProgress: () => {},
-        },
       }}
     >
       <SimplifySlide>

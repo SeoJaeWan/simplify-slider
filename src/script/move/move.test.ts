@@ -27,7 +27,8 @@ describe("Move 테스트", () => {
     move.goToIndex(2);
 
     expect(wrapper.style.transform).toBe("translateX(-2000px)");
-    expect(wrapper.style.transition).toBe(`transform ${duration}ms`);
+    expect(wrapper.style.transitionProperty).toBe("transform");
+    expect(wrapper.style.transitionDuration).toBe(`${duration}ms`);
   });
 
   it("goToByDrag()에 3을 넘겨주면 세 번째 슬라이드의 위치로 이동하고 duration은 1000으로 설정된다.", () => {
@@ -36,7 +37,8 @@ describe("Move 테스트", () => {
     move.goToByDrag(3);
 
     expect(wrapper.style.transform).toBe("translateX(-3000px)");
-    expect(wrapper.style.transition).toBe("transform 1000ms");
+    expect(wrapper.style.transitionDuration).toBe("1000ms");
+    expect(wrapper.style.transitionProperty).toBe("transform");
   });
 
   it("moveToIndex()에 4를 넘겨주면 네 번째 슬라이드의 위치로 이동한다.", () => {
