@@ -31,9 +31,9 @@ class Core {
   #autoplay?: Autoplay;
   #move: Move;
 
-  constructor(wrapper: HTMLOListElement, length: number, options?: ScrollOptions) {
+  constructor(wrapper: HTMLOListElement, length: number, options?: Partial<ScrollOptions>) {
     this.#wrapper = wrapper;
-    this.#options = { ...defaultOptions, ...options } as Required<ScrollOptions>;
+    this.#options = { ...defaultOptions, ...options };
     this.#max = length;
 
     if (length < 1) {
@@ -202,7 +202,7 @@ class Core {
   }
 
   public getIsAutoplay() {
-    return this.#options.autoplay?.enabled;
+    return this.#options.autoplay;
   }
 }
 
