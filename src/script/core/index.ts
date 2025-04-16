@@ -2,25 +2,26 @@ import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
 import type { Direction } from "../../types/drag.types";
-import type { ScrollOptions } from "../../types/scroll.types";
+import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 import Autoplay from "../autoplay";
 import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+
+const defaultAutoplayOptions: AutoplayOptions = {
+  interval: 3000,
+  direction: "right",
+  rolling: false,
+  onProgress: () => {},
+};
 
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
-  autoplay: {
-    direction: "right",
-    rolling: false,
-    interval: 3000,
-    onProgress: () => {},
-  },
   duration: 500,
 };
 class Core {
   #wrapper: HTMLOListElement;
   #currentIndex: number = 1;
-  #options: Required<ScrollOptions>;
+  #options: ScrollOptions;
 
   #isLoading: boolean = false;
 
@@ -31,9 +32,13 @@ class Core {
   #autoplay?: Autoplay;
   #move: Move;
 
-  constructor(wrapper: HTMLOListElement, length: number, options?: Partial<ScrollOptions>) {
+  constructor(wrapper: HTMLOListElement, length: number, options?: SimplifySliderOptions) {
     this.#wrapper = wrapper;
-    this.#options = { ...defaultOptions, ...options };
+    this.#options = {
+      ...defaultOptions,
+      ...options,
+      autoplay: options?.autoplay ? { ...defaultAutoplayOptions, ...options.autoplay } : undefined,
+    };
     this.#max = length;
 
     if (length < 1) {
@@ -84,14 +89,14 @@ class Core {
   }
 
   #initAutoplay() {
-    if (!this.getIsAutoplay()) return;
+    if (!this.#options.autoplay) return;
 
     this.#autoplay = new Autoplay(this.#options.autoplay?.interval);
     this.#autoplayStart();
   }
 
   #autoplayStart = () => {
-    if (!this.#autoplay) return;
+    if (!this.#autoplay || !this.#options.autoplay) return;
 
     this.#autoplay.start(() => {
       if (this.#options.autoplay?.direction === "left") {

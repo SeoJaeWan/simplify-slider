@@ -426,7 +426,6 @@ describe("Core 테스트", () => {
   it("autoplay 옵션이 false일 때, interval에 따라 자동으로 index가 증가하지 않는다.", () => {
     const core = new Core(wrapper, mockLength, {
       autoplay: {
-        enabled: false,
         interval: 1000,
       },
     });
@@ -445,7 +444,6 @@ describe("Core 테스트", () => {
   it("autoplay 옵션이 true일 때, interval에 따라 자동으로 index가 증가한다.", () => {
     const core = new Core(wrapper, mockLength, {
       autoplay: {
-        enabled: true,
         interval: 1000,
       },
     });
@@ -465,7 +463,6 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       loop: true,
       autoplay: {
-        enabled: true,
         interval: 1000,
         direction: "left",
       },
@@ -489,7 +486,6 @@ describe("Core 테스트", () => {
       loop: true,
       drag: true,
       autoplay: {
-        enabled: true,
         interval: 1000,
       },
     });
@@ -504,7 +500,6 @@ describe("Core 테스트", () => {
     const progressCallback = jest.fn();
     new Core(wrapper, mockLength, {
       autoplay: {
-        enabled: true,
         interval: 1000,
         onProgress: progressCallback,
       },
