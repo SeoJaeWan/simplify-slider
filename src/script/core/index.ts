@@ -36,15 +36,7 @@ class Core {
 
   constructor(wrapper: HTMLOListElement, length: number, options?: Partial<ScrollOptions>) {
     this.#wrapper = wrapper;
-    this.#options = {
-      loop: options?.loop ?? defaultOptions.loop,
-      drag: options?.drag ?? defaultOptions.drag,
-      autoplay: {
-        ...defaultAutoplayOptions,
-        ...options?.autoplay,
-      },
-      duration: options?.duration ?? defaultOptions.duration,
-    };
+    this.#options = { ...defaultOptions, ...options };
     this.#max = length;
 
     if (length < 1) {

@@ -11,10 +11,10 @@ function App() {
         drag: true,
         duration: 10000,
         autoplay: {
-          enabled: true,
           interval: 1000,
           direction: "right",
-          rolling: true,
+          rolling: false,
+          onProgress: () => {},
         },
       }}
     >
