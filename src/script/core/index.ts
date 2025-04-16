@@ -10,8 +10,10 @@ export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
   autoplay: {
-    enabled: false,
+    direction: "right",
+    rolling: false,
     interval: 3000,
+    onProgress: () => {},
   },
   duration: 500,
 };
