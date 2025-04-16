@@ -424,11 +424,7 @@ describe("Core 테스트", () => {
   });
 
   it("autoplay 옵션이 false일 때, interval에 따라 자동으로 index가 증가하지 않는다.", () => {
-    const core = new Core(wrapper, mockLength, {
-      autoplay: {
-        interval: 1000,
-      },
-    });
+    const core = new Core(wrapper, mockLength, {});
 
     expect(core.getCurrentIndex()).toBe(1);
     jest.runAllTimers();
