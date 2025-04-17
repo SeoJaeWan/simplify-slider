@@ -37,7 +37,8 @@ jobs:
       - name: Create comment body
         if: failure()
         run: |
-          TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message')
+          npm install -g strip-ansi-cli
+          TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message' | strip-ansi)
 
           echo "TEST_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$TEST_OUTPUT" >> $GITHUB_ENV
