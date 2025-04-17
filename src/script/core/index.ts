@@ -24,7 +24,7 @@ export const defaultOptions: ScrollOptions = {
 class Core {
   #wrapper: HTMLOListElement;
   #currentIndex: number = 1;
-  #options: ScrollOptions = defaultOptions;
+  #options: ScrollOptions;
 
   #isLoading: boolean = false;
 

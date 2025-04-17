@@ -12,7 +12,6 @@ function App() {
           slidesPerView: 4,
           loop: true,
           drag: true,
-          duration: 10000,
         }}
       >
         <SimplifySlide>
