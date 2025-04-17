@@ -19,6 +19,9 @@ describe("Core 테스트", () => {
 
     for (let i = 0; i < mockLength; i++) {
       const listItem = document.createElement("li");
+      Object.defineProperty(listItem, "offsetWidth", {
+        value: 1000,
+      });
       listItem.textContent = `item ${i + 1}`;
 
       wrapper.appendChild(listItem);
@@ -310,6 +313,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
@@ -326,6 +335,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
@@ -342,6 +357,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     core.next();
@@ -362,6 +383,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     core.next();
@@ -383,6 +410,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     core.goTo(mockLength);
     wrapper.dispatchEvent(new Event("transitionend"));
     expect(core.getCurrentIndex()).toBe(3);
@@ -401,6 +434,11 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
       loop: false,
+    });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
     });
 
     core.goTo(mockLength);
@@ -422,6 +460,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
@@ -439,6 +483,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: false,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));

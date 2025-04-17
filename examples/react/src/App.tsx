@@ -8,10 +8,7 @@ function App() {
       <SimplifySlider
         ref={core}
         options={{
-          slidesPerView: 4,
-          loop: true,
           drag: true,
-          duration: 10000,
         }}
       >
         <SimplifySlide>
