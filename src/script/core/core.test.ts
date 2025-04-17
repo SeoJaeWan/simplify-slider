@@ -137,6 +137,42 @@ describe("Core 테스트", () => {
     expect(core.getOptions()).toEqual(defaultOptions);
   });
 
+  it("slidesPerView 옵션을 설정하면 끝에서부터 전달한 수만큼 클론이 만들어진다.", () => {
+    const lastChildren = wrapper.children[wrapper.children.length - 1];
+    const secondLastChildren = wrapper.children[wrapper.children.length - 2];
+
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const clonedFirst = wrapper.children[0];
+    const clonedSecond = wrapper.children[1];
+
+    expect(clonedFirst.classList.contains("cloned")).toBe(true);
+    expect(clonedFirst.textContent).toBe(secondLastChildren.textContent);
+
+    expect(clonedSecond.classList.contains("cloned")).toBe(true);
+    expect(clonedSecond.textContent).toBe(lastChildren.textContent);
+  });
+
+  it("slidesPerView 옵션을 설정하면 처음부터 전달한 수만큼 클론이 만들어진다.", () => {
+    const firstChildren = wrapper.children[0];
+    const secondChildren = wrapper.children[1];
+
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const clonedLast = wrapper.children[wrapper.children.length - 1];
+    const clonedSecondLast = wrapper.children[wrapper.children.length - 2];
+
+    expect(clonedLast.classList.contains("cloned")).toBe(true);
+    expect(clonedLast.textContent).toBe(secondChildren.textContent);
+
+    expect(clonedSecondLast.classList.contains("cloned")).toBe(true);
+    expect(clonedSecondLast.textContent).toBe(firstChildren.textContent);
+  });
+
   it("duration 옵션을 설정하면 해당 값으로 duration이 설정된다.", () => {
     const duration = 2000;
     const core = new Core(wrapper, mockLength, { duration });

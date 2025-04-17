@@ -8,6 +8,7 @@ export interface ScrollOptions {
   loop: boolean;
   duration: number;
   drag: boolean;
+  slidesPerView: number;
   autoplay?: AutoplayOptions;
 }
 

@@ -16,6 +16,7 @@ const defaultAutoplayOptions: AutoplayOptions = {
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
+  slidesPerView: 1,
   duration: 500,
 };
 
@@ -46,7 +47,7 @@ class Core {
       throw new InvalidSlideLengthError();
     }
 
-    this.#move = new Move(this.#wrapper, this.#options.duration);
+    this.#move = new Move(this.#wrapper, this.#options.duration, this.#options.slidesPerView);
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.goTo = this.goTo.bind(this);
@@ -61,21 +62,47 @@ class Core {
   #init() {
     if (this.#wrapper.querySelectorAll(".cloned").length !== 0) return;
 
-    const lastChild = this.#wrapper.lastElementChild;
-    const firstChild = this.#wrapper.firstElementChild;
+    const slides = this.#wrapper.children;
 
-    if (!(lastChild && firstChild)) return;
+    for (const slide of slides) {
+      if (slide instanceof HTMLElement) {
+        slide.style.flexBasis = `${100 / this.#options.slidesPerView}%`;
+      }
+    }
 
-    const clonedLast = lastChild.cloneNode(true);
-    const clonedFirst = firstChild.cloneNode(true);
+    const lastChildren: HTMLElement[] = [];
 
-    if (!(clonedLast instanceof HTMLElement && clonedFirst instanceof HTMLElement)) return;
+    for (let i = 0; i < this.#options.slidesPerView; i++) {
+      const child = this.#wrapper.children[this.#max - this.#options.slidesPerView + i];
+      if (child instanceof HTMLElement) {
+        const clonedChild = child.cloneNode(true) as HTMLElement;
+        clonedChild.classList.add("cloned");
 
-    clonedLast.classList.add("cloned");
-    clonedFirst.classList.add("cloned");
+        lastChildren.push(clonedChild);
+      }
+    }
 
-    this.#wrapper.insertBefore(clonedLast, firstChild);
-    this.#wrapper.appendChild(clonedFirst);
+    const firstChildren: HTMLElement[] = [];
+
+    for (let i = 0; i < this.#options.slidesPerView; i++) {
+      const child = this.#wrapper.children[i];
+      if (child instanceof HTMLElement) {
+        const clonedChild = child.cloneNode(true) as HTMLElement;
+        clonedChild.classList.add("cloned");
+
+        firstChildren.push(clonedChild);
+      }
+    }
+
+    const firstChild = this.#wrapper.firstChild;
+
+    for (const child of lastChildren) {
+      this.#wrapper.insertBefore(child, firstChild);
+    }
+
+    for (const child of firstChildren) {
+      this.#wrapper.appendChild(child);
+    }
 
     this.#updateTransition();
   }
