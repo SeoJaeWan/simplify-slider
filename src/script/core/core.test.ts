@@ -137,7 +137,24 @@ describe("Core 테스트", () => {
     expect(core.getOptions()).toEqual(defaultOptions);
   });
 
-  it("slidesPerView 옵션을 설정하면 끝에서부터 전달한 수만큼 클론이 만들어진다.", () => {
+  it("slidesPerView 옵션을 설정하지 않으면 slide의 너비는 100%로 설정된다.", () => {
+    new Core(wrapper, mockLength);
+    const firstChildren = wrapper.children[0] as HTMLElement;
+
+    expect(firstChildren.style.flexBasis).toBe("100%");
+  });
+
+  it("slidesPerView 옵션을 설정하면 slide의 너비가 100% / slidesPerView로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const firstChildren = wrapper.children[0] as HTMLElement;
+
+    expect(firstChildren.style.flexBasis).toBe("50%");
+  });
+
+  it("slidesPerView 옵션을 통해 끝에서부터 전달한 수만큼 클론이 만들어진다.", () => {
     const lastChildren = wrapper.children[wrapper.children.length - 1];
     const secondLastChildren = wrapper.children[wrapper.children.length - 2];
 
@@ -155,7 +172,7 @@ describe("Core 테스트", () => {
     expect(clonedSecond.textContent).toBe(lastChildren.textContent);
   });
 
-  it("slidesPerView 옵션을 설정하면 처음부터 전달한 수만큼 클론이 만들어진다.", () => {
+  it("slidesPerView 옵션을 통해 처음부터 전달한 수만큼 클론이 만들어진다.", () => {
     const firstChildren = wrapper.children[0];
     const secondChildren = wrapper.children[1];
 
