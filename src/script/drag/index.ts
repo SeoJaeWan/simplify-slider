@@ -1,9 +1,9 @@
-import type { Direction } from "../../types/drag.types";
+import type { DragAction } from "../../types/drag.types";
 
 interface DragOptions {
   element: HTMLElement;
   dragMove: (x: number) => void;
-  dragUpdate: (direction: Direction) => void;
+  dragUpdate: (direction: DragAction) => void;
 }
 
 class Drag {
@@ -17,7 +17,7 @@ class Drag {
 
   #el: HTMLElement;
   #dragMove: (diffX: number) => void;
-  #dragUpdate: (direction: Direction) => void;
+  #dragUpdate: (direction: DragAction) => void;
 
   constructor(options: DragOptions) {
     this.#el = options.element;
@@ -73,10 +73,10 @@ class Drag {
     this.#queueDrag(e.clientX);
   };
 
-  #dragMoveTouch(e: TouchEvent) {
+  #dragMoveTouch = (e: TouchEvent) => {
     if (e.touches.length !== 1) return;
     this.#queueDrag(e.touches[0].clientX);
-  }
+  };
 
   #queueDrag(clientX: number) {
     if (!this.#isDrag) return;
@@ -91,7 +91,8 @@ class Drag {
 
       this.#currentX = this.#pendingX;
       const diffX = this.#startX - this.#currentX;
-      const width = this.#el.offsetWidth;
+      const children = this.#el.children[0] as HTMLElement;
+      const width = children.offsetWidth;
 
       if (Math.abs(diffX) >= width / 2) {
         if (diffX < 0) this.#dragUpdate("prev");
