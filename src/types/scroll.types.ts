@@ -1,13 +1,6 @@
 /**
  * ScrollOptions interface
  */
-
-/**
- * @typedef {Object} ScrollOptions
- * @property {boolean} loop - Whether to loop the slides or not. Default is false.
- * @property {boolean} drag - Whether to enable drag functionality. Default is false.
- * @property {number} duration - Duration of the transition in milliseconds. Default is 500.
- */
 export interface ScrollOptions {
   /** Whether to loop the slides or not. Default is false. */
   loop: boolean;
@@ -15,14 +8,16 @@ export interface ScrollOptions {
   duration: number;
   /** Whether to enable drag functionality. Default is false. */
   drag: boolean;
+  /** Minimum index of the slides. Default is 1. */
+  slidesPerView: number;
+  /** Space between slides in pixels. Default is 0. */
+  spaceBetween: number;
   /** Whether to enable autoplay functionality. Default is false. */
   autoplay?: AutoplayOptions;
 }
 
 /**
- * @typedef {Object} AutoplayOptions
- * @property {number} interval - Interval between slides in milliseconds. Default is 3000.
- * @property {"right" | "left"} direction - Direction of autoplay. Default is "right".
+ * AutoplayOptions interface
  */
 export interface AutoplayOptions {
   /** Interval between slides in milliseconds. Default is 3000. */
