@@ -3,7 +3,7 @@ import Drag from "../drag";
 import Move from "../move";
 import Autoplay from "../autoplay";
 import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
-import type { Direction } from "../../types/drag.types";
+import type { DragAction } from "../../types/drag.types";
 import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 
 const defaultAutoplayOptions: AutoplayOptions = {
@@ -166,12 +166,12 @@ class Core {
     this.#autoplayStop();
   };
 
-  #dragUpdate = (direction: Direction) => {
+  #dragUpdate = (dragAction: DragAction) => {
     if (this.#isLoading) return;
 
-    if (direction === "prev" && (this.#options.loop || this.#currentIndex !== this.#min)) {
+    if (dragAction === "prev" && (this.#options.loop || this.#currentIndex !== this.#min)) {
       this.#currentIndex = this.#currentIndex - 1;
-    } else if (direction === "next" && (this.#options.loop || this.#currentIndex !== this.#max)) {
+    } else if (dragAction === "next" && (this.#options.loop || this.#currentIndex !== this.#max)) {
       this.#currentIndex = this.#currentIndex + 1;
     } else {
       this.#autoplayStart();

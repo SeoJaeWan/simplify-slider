@@ -1,1 +1,1 @@
-export type Direction = "prev" | "next" | "back";
+export type DragAction = "prev" | "next" | "back";

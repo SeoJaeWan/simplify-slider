@@ -1,9 +1,9 @@
-import type { Direction } from "../../types/drag.types";
+import type { DragAction } from "../../types/drag.types";
 
 interface DragOptions {
   element: HTMLElement;
   dragMove: (x: number) => void;
-  dragUpdate: (direction: Direction) => void;
+  dragUpdate: (direction: DragAction) => void;
 }
 
 class Drag {
@@ -17,7 +17,7 @@ class Drag {
 
   #el: HTMLElement;
   #dragMove: (diffX: number) => void;
-  #dragUpdate: (direction: Direction) => void;
+  #dragUpdate: (direction: DragAction) => void;
 
   constructor(options: DragOptions) {
     this.#el = options.element;
