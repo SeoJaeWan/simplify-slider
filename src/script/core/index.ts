@@ -17,6 +17,7 @@ export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
   slidesPerView: 1,
+  spaceBetween: 0,
   duration: 500,
 };
 
@@ -47,7 +48,12 @@ class Core {
       throw new InvalidSlideLengthError();
     }
 
-    this.#move = new Move(this.#wrapper, this.#options.duration, this.#options.slidesPerView);
+    this.#move = new Move(
+      this.#wrapper,
+      this.#options.duration,
+      this.#options.slidesPerView,
+      this.#options.spaceBetween,
+    );
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.goTo = this.goTo.bind(this);
@@ -63,6 +69,7 @@ class Core {
     if (this.#wrapper.querySelectorAll(".cloned").length !== 0) return;
 
     const slides = this.#wrapper.children;
+    this.#wrapper.style.gap = `${this.#options.spaceBetween}px`;
 
     for (const slide of slides) {
       if (slide instanceof HTMLElement) {

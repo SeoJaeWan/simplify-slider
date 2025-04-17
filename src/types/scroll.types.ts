@@ -9,6 +9,7 @@ export interface ScrollOptions {
   duration: number;
   drag: boolean;
   slidesPerView: number;
+  spaceBetween: number;
   autoplay?: AutoplayOptions;
 }
 

@@ -4,11 +4,13 @@ class Move {
   #wrapper: HTMLOListElement;
   #duration: number;
   #slidesPerView: number;
+  #spaceBetween: number;
 
-  constructor(wrapper: HTMLOListElement, duration: number, slidesPerView: number) {
+  constructor(wrapper: HTMLOListElement, duration: number, slidesPerView: number, spaceBetween: number) {
     this.#wrapper = wrapper;
     this.#duration = duration;
     this.#slidesPerView = slidesPerView;
+    this.#spaceBetween = spaceBetween;
 
     this.goToIndex = this.goToIndex.bind(this);
     this.goToByDrag = this.goToByDrag.bind(this);
@@ -24,7 +26,9 @@ class Move {
 
   #getTranslateX(index: number) {
     const wrapperWidth = this.#getWrapperWidth();
-    const translateX = (-index - (this.#slidesPerView - INIT)) * (wrapperWidth / this.#slidesPerView);
+    const translateX =
+      (-index - (this.#slidesPerView - INIT)) * (wrapperWidth / this.#slidesPerView) -
+      this.#spaceBetween * (this.#slidesPerView + index - 1);
 
     return translateX;
   }

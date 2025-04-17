@@ -190,6 +190,13 @@ describe("Core 테스트", () => {
     expect(clonedSecondLast.textContent).toBe(firstChildren.textContent);
   });
 
+  it("spaceBetween 옵션을 설정하면 gap이 해당 값으로 설정된다.", () => {
+    const spaceBetween = 20;
+    new Core(wrapper, mockLength, { spaceBetween });
+
+    expect(wrapper.style.gap).toBe(`${spaceBetween}px`);
+  });
+
   it("duration 옵션을 설정하면 해당 값으로 duration이 설정된다.", () => {
     const duration = 2000;
     const core = new Core(wrapper, mockLength, { duration });
