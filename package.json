@@ -20,23 +20,18 @@
     "url": "https://github.com/SeoJaeWan/simplify-slider/issues"
   },
   "license": "MIT",
-  "exports": {
-    "./react": {
-      "import": "./react/index.js",
-      "require": "./react/index.cjs"
-    }
-  },
-  "files": [
-    "dist"
+  "workspaces": [
+    "packages/core",
+    "packages/react"
   ],
   "size-limit": [
     {
       "name": "React Bundle",
-      "path": "dist/react/index.js"
+      "path": "packages/react/dist/index.js"
     }
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "turbo run build",
     "size": "size-limit",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -44,6 +39,7 @@
     "preview": "vite preview",
     "prepare": "husky install"
   },
+  "packageManager": "npm@10.8.2",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@size-limit/preset-small-lib": "^11.2.0",
@@ -63,12 +59,11 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "size-limit": "^11.2.0",
     "ts-jest": "^29.3.1",
     "ts-node": "^10.9.2",
     "tsup": "^8.4.0",
+    "turbo": "^2.5.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1"
   },

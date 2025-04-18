@@ -1,11 +1,11 @@
 import { useRef } from "react";
-import { Simplify } from "../..";
-import UninitializedCoreError from "../../../errors/uninitializedCoreError";
+import { UninitializedCoreError } from "@simplify-slider/core/errors";
+import Core from "@simplify-slider/core";
 
 const useSimplifySlide = () => {
-  const core = useRef<Simplify>(null);
+  const core = useRef<Core>(null);
 
-  const getCoreOrThrow = (): Simplify => {
+  const getCoreOrThrow = (): Core => {
     if (!core.current) {
       throw new UninitializedCoreError();
     }

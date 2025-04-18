@@ -1,9 +1,8 @@
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useRef } from "react";
 import SimplifySlide from "../simplifySlide";
-import "../../../css/simplifySlider.css";
-import Core from "../../../script/core";
+import Core from "@simplify-slider/core";
 import type { ReactNode, PropsWithChildren, ReactElement } from "react";
-import type { SimplifySliderOptions } from "../../../types/scroll.types";
+import type { SimplifySliderOptions } from "@simplify-slider/core";
 
 interface SimplifySliderProps extends PropsWithChildren {
   options?: SimplifySliderOptions;

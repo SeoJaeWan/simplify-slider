@@ -2,7 +2,7 @@ import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
 import Autoplay from "../autoplay";
-import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+import { InvalidSlideLengthError } from "../../errors";
 import type { DragAction } from "../../types/drag.types";
 import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 

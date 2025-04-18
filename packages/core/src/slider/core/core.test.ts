@@ -1,5 +1,5 @@
 import Core, { defaultOptions } from ".";
-import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+import { InvalidSlideLengthError } from "../../errors";
 import Autoplay from "../autoplay";
 
 describe("Core 테스트", () => {

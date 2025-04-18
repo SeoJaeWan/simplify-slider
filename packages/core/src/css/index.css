@@ -1,3 +1,9 @@
+.simplify-slide {
+  flex-shrink: 0;
+  flex-flow: 0;
+  flex-basis: 100%;
+}
+
 .simplify-slider {
   width: 100%;
 }

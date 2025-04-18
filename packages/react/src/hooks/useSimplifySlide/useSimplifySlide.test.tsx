@@ -1,6 +1,6 @@
 import { render, renderHook } from "@testing-library/react";
 import useSimplifySlide from ".";
-import UninitializedCoreError from "../../../errors/uninitializedCoreError";
+import { UninitializedCoreError } from "@simplify-slider/core";
 import SimplifySlider from "../../components/simplifySlider";
 import SimplifySlide from "../../components/simplifySlide";
 

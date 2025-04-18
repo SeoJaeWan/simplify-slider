@@ -3,16 +3,16 @@
     "target": "ES2020",
     "lib": ["ES2020", "DOM"],
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "jsx": "react-jsx",
+    "moduleResolution": "node",
     "outDir": "dist",
     "declaration": true,
     "declarationDir": "dist/types",
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "jsx": "react-jsx"
   },
-  "include": ["src", "test"],
+  "include": ["packages", "test"],
   "exclude": ["node_modules", "dist", "examples"]
 }
