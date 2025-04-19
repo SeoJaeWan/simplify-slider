@@ -9,6 +9,9 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "test:badges": {
+      "outputs": []
+    },
     "lint": {
       "outputs": []
     }
