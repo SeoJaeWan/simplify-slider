@@ -73,9 +73,11 @@ class Core {
 
     for (const slide of slides) {
       if (slide instanceof HTMLElement) {
+        const wrapperWidth = this.#wrapper.offsetWidth;
         const totalGap = this.#options.spaceBetween * (this.#options.slidesPerView - 1);
+        const slideWidth = (wrapperWidth - totalGap) / this.#options.slidesPerView;
 
-        slide.style.flexBasis = `calc((100% - ${totalGap}px) / ${this.#options.slidesPerView})`;
+        slide.style.flexBasis = `${slideWidth}px`;
       }
     }
 

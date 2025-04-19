@@ -144,7 +144,7 @@ describe("Core 테스트", () => {
     new Core(wrapper, mockLength);
     const firstChildren = wrapper.children[0] as HTMLElement;
 
-    expect(firstChildren.style.flexBasis).toBe("100%");
+    expect(firstChildren.style.flexBasis).toBe("1000px");
   });
 
   it("slidesPerView 옵션을 설정하면 slide의 너비가 100% / slidesPerView로 설정된다.", () => {
@@ -154,7 +154,7 @@ describe("Core 테스트", () => {
 
     const firstChildren = wrapper.children[0] as HTMLElement;
 
-    expect(firstChildren.style.flexBasis).toBe("50%");
+    expect(firstChildren.style.flexBasis).toBe("500px");
   });
 
   it("slidesPerView 옵션을 통해 끝에서부터 전달한 수만큼 클론이 만들어진다.", () => {
