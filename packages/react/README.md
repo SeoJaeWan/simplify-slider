@@ -22,7 +22,7 @@ yarn add @simplify-slider/react
 simplify-slider allows you to easily build a slider layout using the SimplifySlider and SimplifySlide components.
 Check out the examples below to learn how to use the library and configure various options.
 
-### ✅ Default
+#### ✅ Default
 
 ```
 <SimplifySlider>
@@ -46,6 +46,8 @@ Check out the examples below to learn how to use the library and configure vario
 
 Wrap multiple SimplifySlide components inside a SimplifySlider to render a basic slider.
 
+---
+
 #### Ref : Core
 
 ```
@@ -65,12 +67,15 @@ coreRef.current?.getOptions();      // Get the initialized slider options
 You can control the slider instance or retrieve its state using ref.
 Available methods:
 
-Method | Description
-next() | Moves to the next slide
-prev() | Moves to the previous slide
-goTo(index) | Navigates to the specified slide index
-getCurrentIndex() | Returns the current active slide index
-getOptions() | Returns the initialized slider options
+| Method              | Description                            |
+| ------------------- | -------------------------------------- |
+| `next()`            | Moves to the next slide                |
+| `prev()`            | Moves to the previous slide            |
+| `goTo(index)`       | Navigates to the specified slide index |
+| `getCurrentIndex()` | Returns the current active slide index |
+| `getOptions()`      | Returns the initialized slider options |
+
+---
 
 #### 📏 Space Between : number
 
@@ -86,6 +91,8 @@ getOptions() | Returns the initialized slider options
 
 Sets the space between slides. The value is in pixels. Default is 0.
 
+---
+
 #### 📦 Slides Per View : number
 
 ```
@@ -99,6 +106,8 @@ Sets the space between slides. The value is in pixels. Default is 0.
 ```
 
 Specifies how many slides should be visible at once. Default is 1.
+
+---
 
 #### 🔁 Loop : boolean
 
@@ -114,6 +123,8 @@ Specifies how many slides should be visible at once. Default is 1.
 
 Enables infinite looping — after the last slide, it goes back to the first. Default is false.
 
+---
+
 #### ✋ Drag [boolean]
 
 ```
@@ -127,6 +138,8 @@ Enables infinite looping — after the last slide, it goes back to the first. De
 ```
 
 Allows users to swipe or drag to navigate between slides. Default is false.
+
+---
 
 ### ⏱ Autoplay
 
@@ -148,6 +161,8 @@ If you want slides to move automatically, use the autoplay option.
 
 Sets the time interval (in milliseconds) between automatic slide transitions. Default is 3000 (3 seconds).
 
+---
+
 #### ↔️ direction : "left" | "right"
 
 ```
@@ -163,6 +178,8 @@ Sets the time interval (in milliseconds) between automatic slide transitions. De
 ```
 
 Sets the direction of the autoplay transition. Default is "right".
+
+---
 
 #### 🔄 rolling : boolean
 
@@ -180,6 +197,8 @@ Sets the direction of the autoplay transition. Default is "right".
 
 Enables smooth rolling-like transition between slides. Default is false.
 
+---
+
 #### 📊 onProgress : (progress: number) => void
 
 ```
@@ -196,6 +215,8 @@ Enables smooth rolling-like transition between slides. Default is false.
 
 A callback function that receives the slide transition progress in real-time (value between 0 and 1).
 Useful for custom progress bars or indicators.
+
+---
 
 ### 🪝 useSimplifySlide
 
@@ -226,10 +247,11 @@ return (
 );
 ```
 
-Method | Description
-next() | Moves to the next slide
-prev() | Moves to the previous slide
-goTo(index) | Navigates to the specified slide index
-getCurrentIndex() | Returns the current active slide index
-getOptions() | Returns the initialized slider options
-core | The ref object to pass into SimplifySlider
+| Method              | Description                                |
+| ------------------- | ------------------------------------------ |
+| `next()`            | Moves to the next slide                    |
+| `prev()`            | Moves to the previous slide                |
+| `goTo(index)`       | Navigates to the specified slide index     |
+| `getCurrentIndex()` | Returns the current active slide index     |
+| `getOptions()`      | Returns the initialized slider options     |
+| `core`              | The ref object to pass into SimplifySlider |
