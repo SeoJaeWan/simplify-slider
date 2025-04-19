@@ -65,4 +65,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add packages/*/coverage/*.svg
           git diff --cached --quiet || git commit -m "📈 Update coverage badges"
-          git push origin HEAD --force
+          git push origin HEAD:refs/heads/${{ github.head_ref }} --force
