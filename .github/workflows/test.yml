@@ -61,11 +61,11 @@ jobs:
       - name: Commit coverage badges
         if: success()
         run: |
-          mkdir gh-pages-badges
+          mkdir -p badge-publish/core badge-publish/react
           cp packages/core/coverage/*.svg badge-publish/core/
           cp packages/react/coverage/*.svg badge-publish/react/
 
-          cd gh-pages-badges
+          cd badge-publish
 
           git init
           git config user.name "github-actions[bot]"
