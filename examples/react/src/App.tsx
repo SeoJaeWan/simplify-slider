@@ -1,32 +1,47 @@
-import { SimplifySlide, SimplifySlider } from "simplify-slider/react";
+import { SimplifySlide, SimplifySlider, useSimplifySlide } from "simplify-slider/react";
 
 function App() {
-  return (
-    <SimplifySlider>
-      <SimplifySlide>
-        테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴 줄입니다테스트 긴
-        줄입니다
-      </SimplifySlide>
-      <SimplifySlide>
-        테스트테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트
-        2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트 2줄입니다테스트
-        2줄입니다 2줄입니다
-      </SimplifySlide>
-      <SimplifySlide>테스트</SimplifySlide>
+  const { core, next, prev, goTo } = useSimplifySlide();
 
-      <div>테스트</div>
-      <div>테스트</div>
-      <div>테스트</div>
+  return (
+    <SimplifySlider
+      ref={core}
+      options={{
+        loop: true,
+        drag: true,
+        duration: 1000,
+        autoplay: {
+          interval: 1000,
+          direction: "right",
+          rolling: false,
+          onProgress: () => {},
+        },
+      }}
+    >
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>1</div>
+      </SimplifySlide>
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>2</div>
+      </SimplifySlide>
+      <SimplifySlide>
+        <div style={{ height: "200px" }}>3</div>
+      </SimplifySlide>
+
+      <button onClick={prev}>이전</button>
+      <button onClick={next}>다음</button>
+
+      <div>
+        <li>
+          <button onClick={() => goTo(1)}>1</button>
+        </li>
+        <li>
+          <button onClick={() => goTo(2)}>2</button>
+        </li>
+        <li>
+          <button onClick={() => goTo(3)}>3</button>
+        </li>
+      </div>
     </SimplifySlider>
   );
 }
