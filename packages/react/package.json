@@ -44,6 +44,8 @@
   "scripts": {
     "build": "tsup",
     "test": "jest",
+    "test:coverage": "jest --coverage --json --outputFile=test-results.json --no-color",
+    "test:badges": "npm run test:coverage  && jest-coverage-badges",
     "lint": "eslint ."
   }
 }
