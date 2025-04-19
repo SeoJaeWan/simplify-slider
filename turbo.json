@@ -10,6 +10,7 @@
       "outputs": []
     },
     "test:badges": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "lint": {
