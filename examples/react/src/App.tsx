@@ -8,6 +8,9 @@ function App() {
       <SimplifySlider
         ref={core}
         options={{
+          spaceBetween: 20,
+          slidesPerView: 4,
+          loop: true,
           drag: true,
         }}
       >

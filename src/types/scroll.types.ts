@@ -17,6 +17,8 @@ export interface ScrollOptions {
   drag: boolean;
   /** Minimum index of the slides. Default is 1. */
   slidesPerView: number;
+  /** Space between slides in pixels. Default is 0. */
+  spaceBetween: number;
   /** Whether to enable autoplay functionality. Default is false. */
   autoplay?: AutoplayOptions;
 }
