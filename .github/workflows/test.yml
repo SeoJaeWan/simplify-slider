@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test -- --json --outputFile=test-results.json --no-color
+        run: npm test -- -- --json --outputFile=test-results.json --no-color
 
       - name: Create comment body
         if: failure()
