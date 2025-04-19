@@ -4,45 +4,42 @@ function App() {
   const { core, next, prev, goTo } = useSimplifySlide();
 
   return (
-    <SimplifySlider
-      ref={core}
-      options={{
-        loop: true,
-        drag: true,
-        duration: 1000,
-        autoplay: {
-          interval: 1000,
-          direction: "right",
-          rolling: false,
-          onProgress: () => {},
-        },
-      }}
-    >
-      <SimplifySlide>
-        <div style={{ height: "200px" }}>1</div>
-      </SimplifySlide>
-      <SimplifySlide>
-        <div style={{ height: "200px" }}>2</div>
-      </SimplifySlide>
-      <SimplifySlide>
-        <div style={{ height: "200px" }}>3</div>
-      </SimplifySlide>
+    <div style={{ width: "1000px" }}>
+      <SimplifySlider
+        ref={core}
+        options={{
+          drag: true,
+        }}
+      >
+        <SimplifySlide>
+          <div style={{ height: "200px", background: "red" }}>1</div>
+        </SimplifySlide>
+        <SimplifySlide>
+          <div style={{ height: "200px", background: "blue" }}>2</div>
+        </SimplifySlide>
+        <SimplifySlide>
+          <div style={{ height: "200px", background: "green" }}>3</div>
+        </SimplifySlide>
+        <SimplifySlide>
+          <div style={{ height: "200px", background: "pink" }}>4</div>
+        </SimplifySlide>
 
-      <button onClick={prev}>이전</button>
-      <button onClick={next}>다음</button>
+        <button onClick={prev}>이전</button>
+        <button onClick={next}>다음</button>
 
-      <div>
-        <li>
-          <button onClick={() => goTo(1)}>1</button>
-        </li>
-        <li>
-          <button onClick={() => goTo(2)}>2</button>
-        </li>
-        <li>
-          <button onClick={() => goTo(3)}>3</button>
-        </li>
-      </div>
-    </SimplifySlider>
+        <div>
+          <li>
+            <button onClick={() => goTo(1)}>1</button>
+          </li>
+          <li>
+            <button onClick={() => goTo(2)}>2</button>
+          </li>
+          <li>
+            <button onClick={() => goTo(3)}>3</button>
+          </li>
+        </div>
+      </SimplifySlider>
+    </div>
   );
 }
 

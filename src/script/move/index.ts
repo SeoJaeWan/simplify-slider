@@ -3,10 +3,12 @@ import { INIT } from "../../constants";
 class Move {
   #wrapper: HTMLOListElement;
   #duration: number;
+  #slidesPerView: number;
 
-  constructor(wrapper: HTMLOListElement, duration: number) {
+  constructor(wrapper: HTMLOListElement, duration: number, slidesPerView: number) {
     this.#wrapper = wrapper;
     this.#duration = duration;
+    this.#slidesPerView = slidesPerView;
 
     this.goToIndex = this.goToIndex.bind(this);
     this.goToByDrag = this.goToByDrag.bind(this);
@@ -22,13 +24,14 @@ class Move {
 
   #getTranslateX(index: number) {
     const wrapperWidth = this.#getWrapperWidth();
-    const translateX = -index * wrapperWidth;
+    const translateX = (-index - (this.#slidesPerView - INIT)) * (wrapperWidth / this.#slidesPerView);
 
     return translateX;
   }
 
   #updateSlide(index: number, duration: number) {
-    this.#wrapper.style.transition = `transform ${duration}ms`;
+    this.#wrapper.style.transitionProperty = "transform";
+    this.#wrapper.style.transitionDuration = `${duration}ms`;
 
     this.moveToIndex(index);
   }

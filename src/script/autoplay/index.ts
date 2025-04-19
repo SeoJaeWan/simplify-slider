@@ -3,7 +3,7 @@ class Autoplay {
   #frameId: number | null = null;
   #startTime: number = 0;
 
-  constructor(interval: number = 3000) {
+  constructor(interval: number) {
     this.#interval = interval;
 
     this.start = this.start.bind(this);

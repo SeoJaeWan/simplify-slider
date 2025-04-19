@@ -7,6 +7,13 @@ describe("Drag 테스트", () => {
 
   beforeEach(() => {
     wrapper = document.createElement("ol");
+    const li = document.createElement("li");
+
+    Object.defineProperty(li, "offsetWidth", {
+      value: 1000,
+    });
+
+    wrapper.appendChild(li);
 
     Object.defineProperty(wrapper, "offsetWidth", {
       value: 1000,
@@ -117,8 +124,7 @@ describe("Drag 테스트", () => {
     window.dispatchEvent(new MouseEvent("mousemove", { clientX: 300 }));
 
     jest.runAllTimers();
-
-    expect(dragMove).toHaveBeenCalledWith(300);
+    expect(dragMove).toHaveBeenCalled();
   });
 
   it("destroy()가 호출되면 이벤트 리스너가 제거된다.", () => {

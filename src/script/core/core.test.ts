@@ -19,6 +19,9 @@ describe("Core 테스트", () => {
 
     for (let i = 0; i < mockLength; i++) {
       const listItem = document.createElement("li");
+      Object.defineProperty(listItem, "offsetWidth", {
+        value: 1000,
+      });
       listItem.textContent = `item ${i + 1}`;
 
       wrapper.appendChild(listItem);
@@ -135,6 +138,59 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength);
 
     expect(core.getOptions()).toEqual(defaultOptions);
+  });
+
+  it("slidesPerView 옵션을 설정하지 않으면 slide의 너비는 100%로 설정된다.", () => {
+    new Core(wrapper, mockLength);
+    const firstChildren = wrapper.children[0] as HTMLElement;
+
+    expect(firstChildren.style.flexBasis).toBe("100%");
+  });
+
+  it("slidesPerView 옵션을 설정하면 slide의 너비가 100% / slidesPerView로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const firstChildren = wrapper.children[0] as HTMLElement;
+
+    expect(firstChildren.style.flexBasis).toBe("50%");
+  });
+
+  it("slidesPerView 옵션을 통해 끝에서부터 전달한 수만큼 클론이 만들어진다.", () => {
+    const lastChildren = wrapper.children[wrapper.children.length - 1];
+    const secondLastChildren = wrapper.children[wrapper.children.length - 2];
+
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const clonedFirst = wrapper.children[0];
+    const clonedSecond = wrapper.children[1];
+
+    expect(clonedFirst.classList.contains("cloned")).toBe(true);
+    expect(clonedFirst.textContent).toBe(secondLastChildren.textContent);
+
+    expect(clonedSecond.classList.contains("cloned")).toBe(true);
+    expect(clonedSecond.textContent).toBe(lastChildren.textContent);
+  });
+
+  it("slidesPerView 옵션을 통해 처음부터 전달한 수만큼 클론이 만들어진다.", () => {
+    const firstChildren = wrapper.children[0];
+    const secondChildren = wrapper.children[1];
+
+    new Core(wrapper, mockLength, {
+      slidesPerView: 2,
+    });
+
+    const clonedLast = wrapper.children[wrapper.children.length - 1];
+    const clonedSecondLast = wrapper.children[wrapper.children.length - 2];
+
+    expect(clonedLast.classList.contains("cloned")).toBe(true);
+    expect(clonedLast.textContent).toBe(secondChildren.textContent);
+
+    expect(clonedSecondLast.classList.contains("cloned")).toBe(true);
+    expect(clonedSecondLast.textContent).toBe(firstChildren.textContent);
   });
 
   it("duration 옵션을 설정하면 해당 값으로 duration이 설정된다.", () => {
@@ -257,6 +313,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
@@ -273,6 +335,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 500 }));
@@ -289,6 +357,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     core.next();
@@ -309,6 +383,12 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     core.next();
@@ -330,6 +410,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     core.goTo(mockLength);
     wrapper.dispatchEvent(new Event("transitionend"));
     expect(core.getCurrentIndex()).toBe(3);
@@ -348,6 +434,11 @@ describe("Core 테스트", () => {
     const core = new Core(wrapper, mockLength, {
       drag: true,
       loop: false,
+    });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
     });
 
     core.goTo(mockLength);
@@ -369,6 +460,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: true,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
@@ -386,6 +483,12 @@ describe("Core 테스트", () => {
       drag: true,
       loop: false,
     });
+
+    const cloned = wrapper.firstElementChild as HTMLElement;
+    Object.defineProperty(cloned, "offsetWidth", {
+      value: 1000,
+    });
+
     expect(core.getCurrentIndex()).toBe(1);
 
     wrapper.dispatchEvent(new MouseEvent("mousedown", { clientX: 0 }));
@@ -423,7 +526,7 @@ describe("Core 테스트", () => {
     expect(core.getCurrentIndex()).toBe(1);
   });
 
-  it("autoplay 옵션이 false일 때, interval에 따라 자동으로 index가 증가하지 않는다.", () => {
+  it("autoplay 옵션이 없을 때, 자동으로 index가 증가하지 않는다.", () => {
     const core = new Core(wrapper, mockLength, {});
 
     expect(core.getCurrentIndex()).toBe(1);
@@ -437,7 +540,7 @@ describe("Core 테스트", () => {
     expect(core.getCurrentIndex()).toBe(1);
   });
 
-  it("autoplay 옵션이 true일 때, interval에 따라 자동으로 index가 증가한다.", () => {
+  it("autoplay 옵션이 있을 때, interval 시간 마다 자동으로 index가 증가한다.", () => {
     const core = new Core(wrapper, mockLength, {
       autoplay: {
         interval: 1000,
@@ -504,5 +607,116 @@ describe("Core 테스트", () => {
     jest.runAllTimers();
 
     expect(progressCallback).toHaveBeenCalledTimes(9);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, transitionTimingFunction은 linear로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(wrapper.style.transitionTimingFunction).toBe("linear");
+  });
+
+  it("autoplay 옵션에서 rolling이 false일 때, transitionTimingFunction은 ease로 설정된다.", () => {
+    new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: false,
+      },
+    });
+
+    expect(wrapper.style.transitionTimingFunction).toBe("ease");
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, next()가 호출되면 index가 증가하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.next();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, prev()가 호출되면 index가 감소하지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      loop: true,
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.prev();
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, goTo()가 호출되면 index가 변경되지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getCurrentIndex()).toBe(1);
+
+    core.goTo(3);
+    wrapper.dispatchEvent(new Event("transitionend"));
+
+    expect(core.getCurrentIndex()).toBe(1);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, drag 클래스가 생성되지 않는다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      drag: true,
+      autoplay: {
+        rolling: true,
+      },
+    });
+
+    expect(core.getIsDraggable()).toBe(false);
+  });
+
+  it("autoplay 옵션에서 rolling이 true일 때, interval 값은 0이 된다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        interval: 1000,
+        rolling: true,
+      },
+    });
+
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        autoplay: expect.objectContaining({
+          interval: 0,
+        }),
+      }),
+    );
+  });
+
+  it("autoplay 옵션에서 rolling이 false일 때, interval 값은 설정한 값이 된다.", () => {
+    const core = new Core(wrapper, mockLength, {
+      autoplay: {
+        interval: 1000,
+        rolling: false,
+      },
+    });
+
+    expect(core.getOptions()).toEqual(
+      expect.objectContaining({
+        autoplay: expect.objectContaining({
+          interval: 1000,
+        }),
+      }),
+    );
   });
 });

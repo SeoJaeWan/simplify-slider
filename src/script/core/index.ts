@@ -1,10 +1,10 @@
 import { INIT } from "../../constants";
 import Drag from "../drag";
 import Move from "../move";
-import type { Direction } from "../../types/drag.types";
-import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 import Autoplay from "../autoplay";
 import InvalidSlideLengthError from "../../errors/invalidSlideLengthError";
+import type { DragAction } from "../../types/drag.types";
+import type { AutoplayOptions, ScrollOptions, SimplifySliderOptions } from "../../types/scroll.types";
 
 const defaultAutoplayOptions: AutoplayOptions = {
   interval: 3000,
@@ -16,8 +16,10 @@ const defaultAutoplayOptions: AutoplayOptions = {
 export const defaultOptions: ScrollOptions = {
   loop: false,
   drag: false,
+  slidesPerView: 1,
   duration: 500,
 };
+
 class Core {
   #wrapper: HTMLOListElement;
   #currentIndex: number = 1;
@@ -45,7 +47,7 @@ class Core {
       throw new InvalidSlideLengthError();
     }
 
-    this.#move = new Move(this.#wrapper, this.#options.duration);
+    this.#move = new Move(this.#wrapper, this.#options.duration, this.#options.slidesPerView);
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.goTo = this.goTo.bind(this);
@@ -53,33 +55,61 @@ class Core {
     this.getOptions = this.getOptions.bind(this);
 
     this.#init();
+    this.#initDrag();
     this.#initAutoplay();
   }
 
   #init() {
     if (this.#wrapper.querySelectorAll(".cloned").length !== 0) return;
 
-    const lastChild = this.#wrapper.lastElementChild;
-    const firstChild = this.#wrapper.firstElementChild;
+    const slides = this.#wrapper.children;
 
-    if (!(lastChild && firstChild)) return;
+    for (const slide of slides) {
+      if (slide instanceof HTMLElement) {
+        slide.style.flexBasis = `${100 / this.#options.slidesPerView}%`;
+      }
+    }
 
-    const clonedLast = lastChild.cloneNode(true);
-    const clonedFirst = firstChild.cloneNode(true);
+    const lastChildren: HTMLElement[] = [];
 
-    if (!(clonedLast instanceof HTMLElement && clonedFirst instanceof HTMLElement)) return;
+    for (let i = 0; i < this.#options.slidesPerView; i++) {
+      const child = this.#wrapper.children[this.#max - this.#options.slidesPerView + i];
+      if (child instanceof HTMLElement) {
+        const clonedChild = child.cloneNode(true) as HTMLElement;
+        clonedChild.classList.add("cloned");
 
-    clonedLast.classList.add("cloned");
-    clonedFirst.classList.add("cloned");
+        lastChildren.push(clonedChild);
+      }
+    }
 
-    this.#wrapper.insertBefore(clonedLast, firstChild);
-    this.#wrapper.appendChild(clonedFirst);
+    const firstChildren: HTMLElement[] = [];
 
-    this.#initDrag();
+    for (let i = 0; i < this.#options.slidesPerView; i++) {
+      const child = this.#wrapper.children[i];
+      if (child instanceof HTMLElement) {
+        const clonedChild = child.cloneNode(true) as HTMLElement;
+        clonedChild.classList.add("cloned");
+
+        firstChildren.push(clonedChild);
+      }
+    }
+
+    const firstChild = this.#wrapper.firstChild;
+
+    for (const child of lastChildren) {
+      this.#wrapper.insertBefore(child, firstChild);
+    }
+
+    for (const child of firstChildren) {
+      this.#wrapper.appendChild(child);
+    }
+
+    this.#updateTransition();
   }
 
   #initDrag() {
     if (!this.#options.drag) return;
+    if (this.#getIsRolling()) return;
 
     this.#drag = new Drag({
       element: this.#wrapper,
@@ -90,19 +120,30 @@ class Core {
 
   #initAutoplay() {
     if (!this.#options.autoplay) return;
+    if (this.#getIsRolling()) {
+      this.#options.autoplay.interval = 0;
+    }
 
-    this.#autoplay = new Autoplay(this.#options.autoplay?.interval);
+    this.#autoplay = new Autoplay(this.#options.autoplay.interval);
     this.#autoplayStart();
   }
+
+  #updateTransition = () => {
+    if (this.#getIsRolling()) {
+      this.#wrapper.style.transitionTimingFunction = "linear";
+    } else {
+      this.#wrapper.style.transitionTimingFunction = "ease";
+    }
+  };
 
   #autoplayStart = () => {
     if (!this.#autoplay || !this.#options.autoplay) return;
 
     this.#autoplay.start(() => {
       if (this.#options.autoplay?.direction === "left") {
-        this.prev();
+        this.#forcePrev();
       } else {
-        this.next();
+        this.#forceNext();
       }
     }, this.#options.autoplay.onProgress);
   };
@@ -118,12 +159,12 @@ class Core {
     this.#autoplayStop();
   };
 
-  #dragUpdate = (direction: Direction) => {
+  #dragUpdate = (dragAction: DragAction) => {
     if (this.#isLoading) return;
 
-    if (direction === "prev" && (this.#options.loop || this.#currentIndex !== this.#min)) {
+    if (dragAction === "prev" && (this.#options.loop || this.#currentIndex !== this.#min)) {
       this.#currentIndex = this.#currentIndex - 1;
-    } else if (direction === "next" && (this.#options.loop || this.#currentIndex !== this.#max)) {
+    } else if (dragAction === "next" && (this.#options.loop || this.#currentIndex !== this.#max)) {
       this.#currentIndex = this.#currentIndex + 1;
     } else {
       this.#autoplayStart();
@@ -159,9 +200,11 @@ class Core {
 
   #moveTo(index: number) {
     if (this.#isLoading) return;
-    const isOutBounds = !this.#options.loop && (index < this.#min || index > this.#max);
 
+    const isOutBounds = !this.#options.loop && (index < this.#min || index > this.#max);
     if (isOutBounds) return;
+
+    this.#updateTransition();
 
     this.#clearTransition();
     this.#currentIndex = index;
@@ -170,12 +213,25 @@ class Core {
     this.#move.goToIndex(index);
   }
 
-  public next() {
+  #forceNext = () => {
     this.#moveTo(this.#currentIndex + 1);
+  };
+
+  #forcePrev = () => {
+    this.#moveTo(this.#currentIndex - 1);
+  };
+
+  #safeMoveTo = (index: number) => {
+    if (this.#getIsRolling()) return;
+    this.#moveTo(index);
+  };
+
+  public next() {
+    this.#safeMoveTo(this.#currentIndex + 1);
   }
 
   public prev() {
-    this.#moveTo(this.#currentIndex - 1);
+    this.#safeMoveTo(this.#currentIndex - 1);
   }
 
   public goTo(index: number) {
@@ -183,7 +239,7 @@ class Core {
       throw new RangeError(`Index out of bounds: ${index}. Valid range is ${this.#min} to ${this.#max}.`);
     if (this.#currentIndex === index) return;
 
-    this.#moveTo(index);
+    this.#safeMoveTo(index);
   }
 
   public getCurrentIndex() {
@@ -209,6 +265,10 @@ class Core {
   public getIsAutoplay() {
     return this.#options.autoplay;
   }
+
+  #getIsRolling = () => {
+    return this.#options?.autoplay?.rolling;
+  };
 }
 
 export default Core;
