@@ -9,6 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       pull-requests: write
 
     steps:
@@ -32,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test -- -- --json --outputFile=test-results.json --no-color
+        run: npm run test:badges
 
       - name: Create comment body
         if: failure()
@@ -56,3 +57,23 @@ jobs:
 
             **테스트 결과 메시지:**
             ${{ env.TEST_OUTPUT }}
+
+      - name: Commit coverage badges
+        if: success()
+        run: |
+          mkdir -p badge-publish/core badge-publish/react
+          cp packages/core/coverage/*.svg badge-publish/core/
+          cp packages/react/coverage/*.svg badge-publish/react/
+
+          cd badge-publish
+
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+
+          git checkout -b gh-pages
+          git add .
+          git commit -m "📈 Update coverage badges"
+          git push origin gh-pages --force

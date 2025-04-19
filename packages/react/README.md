@@ -2,6 +2,8 @@
 
 https://github.com/SeoJaeWan/simplify-slider
 
+![Branches](https://seojaewan.github.io/simplify-slider/react/badge-branches.svg)
+
 ## 📖 About
 
 simplify-slider is a library designed to help you build simple and intuitive sliders effortlessly.
