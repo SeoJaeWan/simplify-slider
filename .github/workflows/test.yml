@@ -1,0 +1,58 @@
+name: Test and Comment
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- -- --json --outputFile=test-results.json --no-color
+
+      - name: Create comment body
+        if: failure()
+        run: |
+          npm install -g strip-ansi-cli
+          TEST_OUTPUT=$(cat test-results.json | jq -r '.testResults[].message' | strip-ansi)
+
+          echo "TEST_OUTPUT<<EOF" >> $GITHUB_ENV
+          echo "$TEST_OUTPUT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create or update comment
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number}}
+          body: |
+            ## 🚨 Test Failed 🚨
+            작성한 테스트를 통과하지 못했습니다.
+            테스트 케이스를 점검해주세요!
+
+            **테스트 결과 메시지:**
+            ${{ env.TEST_OUTPUT }}

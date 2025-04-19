@@ -1,0 +1,26 @@
+.simplify-slide {
+  flex-shrink: 0;
+  flex-flow: 0;
+  flex-basis: 100%;
+}
+
+.simplify-slider {
+  width: 100%;
+}
+
+.simplify-slider .wrapper {
+  width: 100%;
+
+  overflow: hidden;
+}
+
+.simplify-slider .wrapper .list {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
