@@ -22,7 +22,8 @@
   "license": "MIT",
   "workspaces": [
     "packages/core",
-    "packages/react"
+    "packages/react",
+    "examples/*"
   ],
   "size-limit": [
     {
