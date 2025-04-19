@@ -26,9 +26,10 @@ class Move {
 
   #getTranslateX(index: number) {
     const wrapperWidth = this.#getWrapperWidth();
-    const translateX =
-      (-index - (this.#slidesPerView - INIT)) * (wrapperWidth / this.#slidesPerView) -
-      this.#spaceBetween * (this.#slidesPerView + index - 1);
+    const totalGap = this.#spaceBetween * (this.#slidesPerView - 1);
+    const slideWidth = (wrapperWidth - totalGap) / this.#slidesPerView;
+
+    const translateX = (-index - this.#slidesPerView + INIT) * (slideWidth + this.#spaceBetween);
 
     return translateX;
   }
