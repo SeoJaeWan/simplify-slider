@@ -25,6 +25,9 @@
     "packages/react",
     "examples/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "size-limit": [
     {
       "name": "React Bundle",

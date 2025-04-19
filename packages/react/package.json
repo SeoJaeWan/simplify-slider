@@ -4,6 +4,22 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "homepage": "https://github.com/SeoJaeWan/simplify-slider#readme",
+  "keywords": [
+    "react",
+    "simplify",
+    "slider",
+    "carousel",
+    "react"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SeoJaeWan/simplify-slider"
+  },
+  "bugs": {
+    "url": "https://github.com/SeoJaeWan/simplify-slider/issues"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
