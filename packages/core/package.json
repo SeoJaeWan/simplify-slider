@@ -19,9 +19,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "size": "size-limit",
     "test": "jest",
-    "test:watch": "jest --watch",
     "lint": "eslint ."
   }
 }
