@@ -20,42 +20,36 @@
     "url": "https://github.com/SeoJaeWan/simplify-slider/issues"
   },
   "license": "MIT",
-  "exports": {
-    "./react": {
-      "import": "./react/index.js",
-      "require": "./react/index.cjs"
-    }
-  },
-  "files": [
-    "dist"
+  "workspaces": [
+    "packages/core",
+    "packages/react",
+    "examples/*"
   ],
   "size-limit": [
     {
       "name": "React Bundle",
-      "path": "dist/react/index.js"
+      "path": "packages/react/dist/index.js"
+    },
+    {
+      "name": "Core Bundle",
+      "path": "packages/core/dist/index.js"
     }
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "size": "size-limit",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "lint": "turbo run lint",
     "prepare": "husky install"
   },
+  "packageManager": "npm@10.8.2",
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@size-limit/preset-small-lib": "^11.2.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
     "@types/jest": "^29.5.14",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
     "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
@@ -63,12 +57,11 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "size-limit": "^11.2.0",
     "ts-jest": "^29.3.1",
     "ts-node": "^10.9.2",
     "tsup": "^8.4.0",
+    "turbo": "^2.5.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1"
   },

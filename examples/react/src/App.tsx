@@ -1,4 +1,4 @@
-import { SimplifySlide, SimplifySlider, useSimplifySlide } from "simplify-slider/react";
+import { SimplifySlide, SimplifySlider, useSimplifySlide } from "@simplify-slider/react";
 
 function App() {
   const { core, next, prev, goTo } = useSimplifySlide();
