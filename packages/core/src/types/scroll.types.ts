@@ -1,13 +1,6 @@
 /**
  * ScrollOptions interface
  */
-
-/**
- * @typedef {Object} ScrollOptions
- * @property {boolean} loop - Whether to loop the slides or not. Default is false.
- * @property {boolean} drag - Whether to enable drag functionality. Default is false.
- * @property {number} duration - Duration of the transition in milliseconds. Default is 500.
- */
 export interface ScrollOptions {
   /** Whether to loop the slides or not. Default is false. */
   loop: boolean;
